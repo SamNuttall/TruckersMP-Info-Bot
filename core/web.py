@@ -44,6 +44,7 @@ def validate_resp(func_resp: dict, expected_keys: tuple):
     if 'resp' not in func_resp:  # Should never happen
         return False
     resp = func_resp['resp']
-    if expected_keys not in resp:
-        return False
+    for key in expected_keys:
+        if key not in resp:
+            return False
     return True
