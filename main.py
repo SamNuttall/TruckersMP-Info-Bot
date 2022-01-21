@@ -16,7 +16,7 @@ bot = interactions.Client(token=TOKEN)
     options=[
         interactions.Option(
             type=interactions.OptionType.INTEGER,
-            name="name",
+            name="server",
             description="Get information for a specific server only",
             required=False,
             autocomplete=True
@@ -30,8 +30,8 @@ bot = interactions.Client(token=TOKEN)
         )
     ]
 )
-async def test(ctx: interactions.CommandContext, name: int = None, game: str = None):
-    server_id = name
+async def test(ctx: interactions.CommandContext, server: int = None, game: str = None):
+    server_id = server
     server_data = await data.get_servers()
     if server_data['error']:
         # Something went wrong
@@ -50,7 +50,7 @@ async def test(ctx: interactions.CommandContext, name: int = None, game: str = N
     # Server not found
 
 
-@bot.autocomplete("name", command=bot.http.cache.interactions.get("servers").id)
+@bot.autocomplete("server", command=bot.http.cache.interactions.get("servers").id)
 async def autocomplete_servers(ctx, user_input: str = ""):
     servers = await data.get_servers()
     if not servers['error']:
