@@ -60,7 +60,51 @@ async def autocomplete_servers(ctx, user_input: str = ""):
 
 
 @bot.autocomplete("game", command=bot.http.cache.interactions.get("servers").id)
-async def autocomplete_games(ctx, user_input: str = ""):
+async def autocomplete_servers_games(ctx, user_input: str = ""):
+    return  # Pending implementation
+
+
+@bot.command(
+    name="traffic",
+    description="Get information about traffic in-game",
+    scope=TEST_GUILD_ID,
+    options=[
+        interactions.Option(
+            type=interactions.OptionType.STRING,
+            name="location",
+            description="Get traffic for a specific location only",
+            required=False,
+            autocomplete=True
+        ),
+        interactions.Option(
+            type=interactions.OptionType.STRING,
+            name="game",
+            description="Get traffic for servers of a particular game only",
+            required=False,
+            autocomplete=True
+        )
+    ]
+)
+async def test(ctx: interactions.CommandContext, location: str = None, game: str = None):
+    return  # Pending implementation
+
+
+@bot.autocomplete("location", command=bot.http.cache.interactions.get("traffic").id)
+async def autocomplete_traffic(ctx, user_input: str = ""):
+    traffic_servers = await data.get_traffic_servers()
+    if traffic_servers['error']:
+        return  # error
+    traffic = await data.get_traffic(traffic_servers['servers'])
+    if traffic['error']:
+        return
+    if not traffic['error']:
+        await ctx.populate(
+            await assemble.get_location_choices(traffic['traffic'], user_input)
+        )
+
+
+@bot.autocomplete("game", command=bot.http.cache.interactions.get("traffic").id)
+async def autocomplete_traffic_games(ctx, user_input: str = ""):
     return  # Pending implementation
 
 

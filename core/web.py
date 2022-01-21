@@ -2,13 +2,14 @@ import aiohttp
 import asyncio
 
 
-async def get_request(url: str, headers: dict = None, timeout: int = 10):
+async def get_request(url: str, headers: dict = None, params: dict = None, timeout: int = 10):
     """
     Makes a web get request (eg. to an API) for JSON.
 
     Args:
         url: str = The endpoint of the get request
         headers: dict = HTTP headers to send with the request
+        params: dict = Parameters to pass with request
         timeout: int = How long to wait for a response before cancelling
     Returns:
         dict =
@@ -19,7 +20,7 @@ async def get_request(url: str, headers: dict = None, timeout: int = 10):
     result['error'] = False
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, timeout=timeout) as resp:
+            async with session.get(url, headers=headers, params=params, timeout=timeout) as resp:
                 if resp.status == 200:
                     result['resp'] = await resp.json()
                 if 'resp' not in result:
