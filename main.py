@@ -26,7 +26,7 @@ bot = interactions.Client(token=TOKEN)
             name="game",
             description="Get information for servers of a particular game only",
             required=False,
-            autocomplete=True
+            choices=assemble.get_game_choices()
         )
     ]
 )
@@ -59,11 +59,6 @@ async def autocomplete_servers(ctx, user_input: str = ""):
         )
 
 
-@bot.autocomplete("game", command=bot.http.cache.interactions.get("servers").id)
-async def autocomplete_servers_games(ctx, user_input: str = ""):
-    return  # Pending implementation
-
-
 @bot.command(
     name="traffic",
     description="Get information about traffic in-game",
@@ -78,14 +73,21 @@ async def autocomplete_servers_games(ctx, user_input: str = ""):
         ),
         interactions.Option(
             type=interactions.OptionType.STRING,
+            name="server",
+            description="Get traffic for a specific server only",
+            required=False,
+            autocomplete=True
+        ),
+        interactions.Option(
+            type=interactions.OptionType.STRING,
             name="game",
             description="Get traffic for servers of a particular game only",
             required=False,
-            autocomplete=True
+            choices=assemble.get_game_choices()
         )
     ]
 )
-async def test(ctx: interactions.CommandContext, location: str = None, game: str = None):
+async def test(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
     return  # Pending implementation
 
 
@@ -103,9 +105,13 @@ async def autocomplete_traffic(ctx, user_input: str = ""):
         )
 
 
-@bot.autocomplete("game", command=bot.http.cache.interactions.get("traffic").id)
-async def autocomplete_traffic_games(ctx, user_input: str = ""):
-    return  # Pending implementation
+@bot.autocomplete("server", command=bot.http.cache.interactions.get("traffic").id)
+async def autocomplete_traffic_servers(ctx, user_input: str = ""):
+    servers = await data.get_traffic_servers()
+    if not servers['error']:
+        await ctx.populate(
+            await assemble.get_server_choices(servers['servers'], user_input)
+        )
 
 
 if __name__ == "__main__":

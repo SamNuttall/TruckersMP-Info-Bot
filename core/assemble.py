@@ -42,9 +42,12 @@ async def get_server_choices(servers: list, search: str = "", maximum: int = 25,
             valid_score = server['sim_score'] <= min_sim_score or server['contains'] == 1
         if len(choice_list) >= maximum or not valid_score:
             break
+        identifier = 'id'
+        if 'id' not in server:
+            identifier = 'url'
         choice_list.append(Choice(
-            name=f"{server['name']} ({server['game']})",
-            value=server['id']
+            name=f"{server['name']} ({server['game'].upper()})",
+            value=server[identifier]
         ))
     return choice_list
 
@@ -86,4 +89,24 @@ async def get_location_choices(locations: list, search: str = "", maximum: int =
                 value=location['layerID']
             ))
             added_locations.append(location['name'])
+    return choice_list
+
+
+def get_game_choices():
+    """
+    Gets the list of available games (hard-coded)
+
+    Returns:
+        list: interactions.Choice
+    """
+    choice_list = []
+    games = {
+        'ETS2': "Euro Truck Simulator 2",
+        'ATS': "American Truck Simulator"
+    }
+    for short_name, full_name in games.items():
+        choice_list.append(Choice(
+            name=f"{full_name} ({short_name})",
+            value=short_name
+        ))
     return choice_list
