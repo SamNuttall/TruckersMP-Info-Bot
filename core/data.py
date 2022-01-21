@@ -1,13 +1,16 @@
-from web import get_request, validate_resp
+from core.web import get_request, validate_resp
+from cache import AsyncTTL
 
 
+@AsyncTTL(time_to_live=60, maxsize=1)
 async def get_servers():
     """
     Gets a list of all TruckersMP servers
 
     Returns:
-        error: bool = True if status not 200 or other error
-        servers?: list = Contains dicts with server info (https://stats.truckersmp.com/api#servers_list)
+        dict =
+            error: bool = True if status not 200 or other error
+            servers?: list = Contains dicts with server info (https://stats.truckersmp.com/api#servers_list)
     """
     result = dict()
     result['error'] = False
