@@ -16,12 +16,17 @@ async def add_sim_score(list_of_dict: list, search: str, key: str):
     """
     for dictionary in list_of_dict:
         dictionary['sim_score'] = SequenceMatcher(None, dictionary[key], search).ratio()
+        dictionary['first_sim_score'] = SequenceMatcher(None, dictionary[key].split()[0], search).ratio()
+        dictionary['trim_sim_score'] = SequenceMatcher(None, dictionary[key].split('(')[0], search).ratio()
         dictionary['contains'] = 1 if search.lower() in dictionary[key].lower() else 0
-    return sorted(list_of_dict, key=lambda x: (x['contains'], x['sim_score']), reverse=True)
+    return sorted(
+        list_of_dict, key=lambda x: (x['contains'], x['sim_score'], x['trim_sim_score'], x['first_sim_score']),
+        reverse=True
+    )
 
 
 @AsyncLRU(maxsize=1024)
-async def get_server_choices(servers: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.2):
+async def get_server_choices(servers: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.4):
     """
     Get a list of TruckersMP servers to use as choices
 
@@ -39,7 +44,9 @@ async def get_server_choices(servers: list, search: str = "", maximum: int = 25,
     for server in servers:
         valid_score = True
         if search != "":
-            valid_score = server['sim_score'] <= min_sim_score or server['contains'] == 1
+            valid_score = max(server['sim_score'],
+                              server['trim_sim_score'],
+                              server['first_sim_score']) >= min_sim_score or server['contains'] == 1
         if len(choice_list) >= maximum or not valid_score:
             break
         identifier = 'id'
@@ -61,7 +68,7 @@ def get_traffic_server_choices():
 
 
 @AsyncLRU(maxsize=1024)
-async def get_location_choices(locations: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.2):
+async def get_location_choices(locations: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.55):
     """
     Get a list of in-game locations to use as choices
 
@@ -80,7 +87,9 @@ async def get_location_choices(locations: list, search: str = "", maximum: int =
     for location in locations:
         valid_score = True
         if search != "":
-            valid_score = location['sim_score'] <= min_sim_score or location['contains'] == 1
+            valid_score = max(location['sim_score'],
+                              location['trim_sim_score'],
+                              location['first_sim_score']) >= min_sim_score or location['contains'] == 1
         if len(choice_list) >= maximum or not valid_score:
             break
         if location['name'] not in added_locations:
