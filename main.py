@@ -1,5 +1,5 @@
 import interactions
-from core import assemble, data
+from core import assemble, data, embed
 from os import getenv
 from dotenv import load_dotenv
 
@@ -30,24 +30,24 @@ bot = interactions.Client(token=TOKEN)
         )
     ]
 )
-async def test(ctx: interactions.CommandContext, server: int = None, game: str = None):
+async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game: str = None):
     server_id = server
     server_data = await data.get_servers()
     if server_data['error']:
-        # Something went wrong
+        await ctx.send(embeds=await embed.generic_error(), ephemeral=True)
         return
     servers = server_data['servers']
     if not server_id:
-        # All servers (possibly filtered by game)
+        await ctx.send(embeds=await embed.servers_stats(servers), ephemeral=True)  # Needs to be filtered by game
         return
     server = None
     for s in servers:
         if s['id'] == server_id:
             server = s
     if server:
-        # Specific server
+        await ctx.send(embeds=await embed.server_stats(server), ephemeral=True)
         return
-    # Server not found
+    await ctx.send(embeds=await embed.item_not_found("Specified TruckersMP server"), ephemeral=True)
 
 
 @bot.autocomplete("server", command=bot.http.cache.interactions.get("servers").id)
@@ -87,7 +87,7 @@ async def autocomplete_servers(ctx, user_input: str = ""):
         )
     ]
 )
-async def test(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
+async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
     return  # Pending implementation
 
 
