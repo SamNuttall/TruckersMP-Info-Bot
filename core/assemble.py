@@ -89,8 +89,12 @@ async def get_location_choices(locations: list, search: str = "", maximum: int =
         if search != "":
             valid_score = max(location['sim_score'],
                               location['trim_sim_score'],
-                              location['first_sim_score']) >= min_sim_score or location['contains'] == 1
-        if len(choice_list) >= maximum or not valid_score:
+                              location['first_sim_score']) >= min_sim_score or (
+                                  location['contains'] == 1 or location['country'].lower() in search.lower()
+                          )
+        if not valid_score:
+            continue
+        if len(choice_list) >= maximum:
             break
         if location['name'] not in added_locations:
             choice_list.append(Choice(
