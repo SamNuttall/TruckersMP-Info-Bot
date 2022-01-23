@@ -38,7 +38,7 @@ async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game
         return
     servers = server_data['servers']
     if not server_id:
-        await ctx.send(embeds=await embed.servers_stats(servers), ephemeral=True)  # Needs to be filtered by game
+        await ctx.send(embeds=await embed.servers_stats(servers, game), ephemeral=True)  # Needs to be filtered by game
         return
     server = None
     for s in servers:

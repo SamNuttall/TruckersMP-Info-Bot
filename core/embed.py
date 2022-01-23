@@ -29,10 +29,12 @@ async def trim_name(name: str, max_chars: int = 10, add_dots: bool = True):
     return name
 
 
-async def servers_stats(servers: list):
+async def servers_stats(servers: list, filter_by_game: str = None):
     """Takes a list of servers and creates an embed from them"""
     fields = []
     for server in servers:
+        if filter_by_game and filter_by_game != server['game']:
+            continue
         status_emoji = emoji.get(Emoji.UP if server['online'] else Emoji.DOWN)
         game_emoji = emoji.get(Emoji.ETS2 if server['game'].upper() == "ETS2" else Emoji.ATS)
         name = server['shortname'] if not server['event'] else await trim_name(server['name'])
