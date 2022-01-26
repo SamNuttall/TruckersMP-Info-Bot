@@ -1,5 +1,6 @@
 import interactions
 from core import assemble, data, embed
+from core import command as c
 from os import getenv
 from dotenv import load_dotenv
 
@@ -10,25 +11,10 @@ bot = interactions.Client(token=TOKEN)
 
 
 @bot.command(
-    name="servers",
-    description="Get information about TruckersMP server(s)",
+    name=c.get(c.Name.SERVERS),
+    description=c.get(c.Description.SERVERS),
     scope=TEST_GUILD_ID,
-    options=[
-        interactions.Option(
-            type=interactions.OptionType.INTEGER,
-            name="server",
-            description="Get information for a specific server only",
-            required=False,
-            autocomplete=True
-        ),
-        interactions.Option(
-            type=interactions.OptionType.STRING,
-            name="game",
-            description="Get information for servers of a particular game only",
-            required=False,
-            choices=assemble.get_game_choices()
-        )
-    ]
+    options=c.get(c.Options.SERVERS)
 )
 async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game: str = None):
     server_id = server
@@ -50,8 +36,8 @@ async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game
     await ctx.send(embeds=await embed.item_not_found("Specified TruckersMP server"), ephemeral=True)
 
 
-@bot.autocomplete("server", command=bot._http.cache.interactions.get("servers").id)
-async def autocomplete_servers(ctx, user_input: str = ""):
+@bot.autocomplete(c.get(c.OptionName.SERVER), command=c.get_command(bot, c.Name.SERVERS).id)
+async def autocomplete_server(ctx, user_input: str = ""):
     servers = await data.get_servers()
     if not servers['error']:
         await ctx.populate(
@@ -60,38 +46,16 @@ async def autocomplete_servers(ctx, user_input: str = ""):
 
 
 @bot.command(
-    name="traffic",
-    description="Get information about traffic in-game",
+    name=c.get(c.Name.TRAFFIC),
+    description=c.get(c.Description.TRAFFIC),
     scope=TEST_GUILD_ID,
-    options=[
-        interactions.Option(
-            type=interactions.OptionType.STRING,
-            name="location",
-            description="Get traffic for a specific location only",
-            required=False,
-            autocomplete=True
-        ),
-        interactions.Option(
-            type=interactions.OptionType.STRING,
-            name="server",
-            description="Get traffic for a specific server only",
-            required=False,
-            autocomplete=True
-        ),
-        interactions.Option(
-            type=interactions.OptionType.STRING,
-            name="game",
-            description="Get traffic for servers of a particular game only",
-            required=False,
-            choices=assemble.get_game_choices()
-        )
-    ]
+    options=c.get(c.Options.TRAFFIC)
 )
 async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
     return  # Pending implementation
 
 
-@bot.autocomplete("location", command=bot._http.cache.interactions.get("traffic").id)
+@bot.autocomplete(c.get(c.OptionName.LOCATION), command=c.get_command(bot, c.Name.TRAFFIC).id)
 async def autocomplete_traffic(ctx, user_input: str = ""):
     traffic_servers = await data.get_traffic_servers()
     if traffic_servers['error']:
@@ -105,7 +69,7 @@ async def autocomplete_traffic(ctx, user_input: str = ""):
         )
 
 
-@bot.autocomplete("server", command=bot._http.cache.interactions.get("traffic").id)
+@bot.autocomplete(c.get(c.OptionName.SERVER), command=c.get_command(bot, c.Name.TRAFFIC).id)
 async def autocomplete_traffic_servers(ctx, user_input: str = ""):
     servers = await data.get_traffic_servers()
     if not servers['error']:
