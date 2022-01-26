@@ -50,7 +50,7 @@ async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game
     await ctx.send(embeds=await embed.item_not_found("Specified TruckersMP server"), ephemeral=True)
 
 
-@bot.autocomplete("server", command=bot.http.cache.interactions.get("servers").id)
+@bot.autocomplete("server", command=bot._http.cache.interactions.get("servers").id)
 async def autocomplete_servers(ctx, user_input: str = ""):
     servers = await data.get_servers()
     if not servers['error']:
@@ -91,7 +91,7 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
     return  # Pending implementation
 
 
-@bot.autocomplete("location", command=bot.http.cache.interactions.get("traffic").id)
+@bot.autocomplete("location", command=bot._http.cache.interactions.get("traffic").id)
 async def autocomplete_traffic(ctx, user_input: str = ""):
     traffic_servers = await data.get_traffic_servers()
     if traffic_servers['error']:
@@ -105,7 +105,7 @@ async def autocomplete_traffic(ctx, user_input: str = ""):
         )
 
 
-@bot.autocomplete("server", command=bot.http.cache.interactions.get("traffic").id)
+@bot.autocomplete("server", command=bot._http.cache.interactions.get("traffic").id)
 async def autocomplete_traffic_servers(ctx, user_input: str = ""):
     servers = await data.get_traffic_servers()
     if not servers['error']:
