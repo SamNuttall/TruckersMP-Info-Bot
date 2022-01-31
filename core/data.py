@@ -1,6 +1,8 @@
 import asyncio
+import dateutil.parser
 from core.web import get_request, validate_resp
 from cache import AsyncTTL, AsyncLRU
+
 
 
 @AsyncTTL(time_to_live=60, maxsize=1)
@@ -28,14 +30,28 @@ async def get_servers():
     return result
 
 
+@AsyncTTL(time_to_live=60, maxsize=1)
 async def get_ingame_time():
     """
     Gets the in-game time
 
-    Pending implementation
+    Returns:
+        dict =
+            error: bool = True if status not 200 or other error
+            result?: str = The in-game time in formatted 12h time
     """
-    endpoint = "https://api.truckersmp.com/v2/game_time"  # Investigate implementation without TruckyApp
-    return
+    # Investigate implementation without TruckyApp
+    result = dict()
+    result['error'] = False
+    endpoint = "https://api.truckyapp.com/v2/truckersmp/time"
+    func_resp = await get_request(endpoint)
+    if not validate_resp(func_resp, ('response', )):
+        result['error'] = True
+        return result
+    resp = func_resp['resp']
+    time_data = resp['response']['calculated_game_time']
+    result['time'] = dateutil.parser.isoparse(time_data).strftime('%I:%M %p')
+    return result
 
 
 @AsyncTTL(time_to_live=60, maxsize=1)

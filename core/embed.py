@@ -41,7 +41,7 @@ async def format_fields(fields: list, expected_length: int = 9):
         ))
     if input_len == 0:
         fields.append(EmbedField(
-            name=":mag: :cry: All locations have no players",
+            name=":cry: All locations have no players",
             value=f"I've searched all over this server but it looks like all locations have no players.",
             inline=False,
         ))
@@ -55,7 +55,8 @@ async def format_fields(fields: list, expected_length: int = 9):
 
 
 async def get_description(filter_by_server: str = None, filter_by_game: str = None,
-                          total_players: int = None, max_total_players: int = None, total_in_queue: int = None):
+                          total_players: int = None, max_total_players: int = None,
+                          total_in_queue: int = None, ingame_time: str = None):
     """Get the description for an embed based on the filters"""
     description = f":pencil: **Filtered by "
     if filter_by_server:
@@ -67,10 +68,12 @@ async def get_description(filter_by_server: str = None, filter_by_game: str = No
     if total_players is not None and max_total_players is not None and total_in_queue is not None:
         description += (f"\n**:busts_in_silhouette: Total Players:** " +
                         f"{total_players}/{max_total_players} ({total_in_queue} in queue)")
+    if ingame_time:
+        description += f"\n**:alarm_clock: In-game time:** {ingame_time}"
     return description
 
 
-async def servers_stats(servers: list, filter_by_game: str = None):
+async def servers_stats(servers: list, filter_by_game: str = None, ingame_time: str = None):
     """Takes a list of servers and creates an embed from them"""
     fields = []
     total_players = 0
@@ -104,13 +107,16 @@ async def servers_stats(servers: list, filter_by_game: str = None):
             inline=True,
         ))
     fields = await format_fields(fields, 0)
+    if not ingame_time:
+        ingame_time = "Unknown"
     return Embed(
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
         description=await get_description(filter_by_game=filter_by_game,
                                           total_players=total_players,
                                           max_total_players=max_total_players,
-                                          total_in_queue=total_in_queue),
+                                          total_in_queue=total_in_queue,
+                                          ingame_time=ingame_time),
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         color=0x017af4,
         timestamp=str(datetime.utcnow()),

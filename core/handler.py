@@ -1,16 +1,20 @@
+import asyncio
 from interactions import CommandContext
 from core import assemble, data, embed
 
 
 async def servers_cmd(ctx: CommandContext, server: int, game: str):
     server_id = server
-    server_data = await data.get_servers()
+    server_data, time_data = await asyncio.gather(data.get_servers(), data.get_ingame_time())
     if server_data['error']:
         await ctx.send(embeds=await embed.generic_error(), ephemeral=True)
         return
     servers = server_data['servers']
+    ingame_time = None
+    if not time_data['error']:
+        ingame_time = time_data['time']
     if not server_id:
-        await ctx.send(embeds=await embed.servers_stats(servers, game), ephemeral=True)
+        await ctx.send(embeds=await embed.servers_stats(servers, game, ingame_time), ephemeral=True)
         return
     server = None
     for s in servers:
