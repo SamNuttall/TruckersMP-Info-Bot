@@ -28,7 +28,7 @@ async def add_sim_score(list_of_dict: list, search: str, key: str):
 @AsyncLRU(maxsize=1024)
 async def get_server_choices(servers: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.4):
     """
-    Get a list of TruckersMP servers to use as choices
+    Get a list of TruckersMP (traffic) servers to use as choices
 
     Args:
         servers: list = List of dicts containing each server's info
@@ -57,14 +57,6 @@ async def get_server_choices(servers: list, search: str = "", maximum: int = 25,
             value=server[identifier]
         ))
     return choice_list
-
-
-def get_traffic_server_choices():
-    """
-    Get a list of TruckersMP traffic servers to use as choices
-
-    Pending implementation
-    """
 
 
 @AsyncLRU(maxsize=1024)
