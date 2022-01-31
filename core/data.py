@@ -92,6 +92,7 @@ async def get_traffic(traffic_servers: list):
         for country in countries:
             for location in country['locations']:
                 location['game'] = game_order[index]
+                location['server'] = traffic_servers[index]
                 traffic.append(location)
     traffic = sorted(traffic, key=lambda x: (x['players']), reverse=True)
     result['traffic'] = traffic

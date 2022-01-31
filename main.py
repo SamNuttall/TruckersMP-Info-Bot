@@ -42,7 +42,7 @@ async def autocomplete_traffic(ctx, user_input: str = ""):
 
 @bot.autocomplete(c.get(c.OptionName.SERVER), command=c.get_command(bot, c.Name.TRAFFIC).id)
 async def autocomplete_traffic_servers(ctx, user_input: str = ""):
-    await h.autocomplete_traffic(ctx, user_input)
+    await h.autocomplete_traffic_servers(ctx, user_input)
 
 
 if __name__ == "__main__":

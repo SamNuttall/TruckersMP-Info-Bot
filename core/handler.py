@@ -23,7 +23,17 @@ async def servers_cmd(ctx: CommandContext, server: int, game: str):
 
 
 async def traffic_cmd(ctx, location: str, server: str, game: str):
-    return  # Pending implementation
+    traffic_servers = await data.get_traffic_servers()
+    if traffic_servers['error']:
+        await ctx.send(embeds=await embed.generic_error(), ephemeral=True)
+        return
+    traffic = await data.get_traffic(traffic_servers['servers'])
+    if traffic['error']:
+        await ctx.send(embeds=await embed.generic_error(), ephemeral=True)
+        return
+    if not location:
+        await ctx.send(embeds=await embed.traffic_stats(traffic['traffic'], server, game), ephemeral=True)
+        return
 
 
 async def autocomplete_server(ctx, user_input: str):
