@@ -4,7 +4,7 @@ from datetime import datetime
 from core import emoji
 from core.emoji import Emoji
 
-TRUCKERSMP_LOGO = "https://cdn.discordapp.com/attachments/591653516620201994/591663065653706777/tmp.png"  # Temporary
+TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 
 
 async def item_not_found(item: str):
@@ -35,9 +35,9 @@ async def format_fields(fields: list, expected_length: int = 9):
     input_len = len(fields)
     if len(fields) % 3 == 2:
         fields.append(EmbedField(
-                name=f"⠀",
-                value=f"⠀",
-                inline=True
+            name=f"⠀",
+            value=f"⠀",
+            inline=True
         ))
     if input_len == 0:
         fields.append(EmbedField(
@@ -54,7 +54,8 @@ async def format_fields(fields: list, expected_length: int = 9):
     return fields
 
 
-async def get_description(filter_by_server: str = None, filter_by_game: str = None):
+async def get_description(filter_by_server: str = None, filter_by_game: str = None,
+                          total_players: int = None, max_total_players: int = None, total_in_queue: int = None):
     """Get the description for an embed based on the filters"""
     description = f":pencil: **Filtered by "
     if filter_by_server:
@@ -62,13 +63,19 @@ async def get_description(filter_by_server: str = None, filter_by_game: str = No
     elif filter_by_game:
         description += f"game:** {filter_by_game}"
     else:
-        description = None
+        description = ""
+    if total_players is not None and max_total_players is not None and total_in_queue is not None:
+        description += (f"\n**:busts_in_silhouette: Total Players:** " +
+                        f"{total_players}/{max_total_players} ({total_in_queue} in queue)")
     return description
 
 
 async def servers_stats(servers: list, filter_by_game: str = None):
     """Takes a list of servers and creates an embed from them"""
     fields = []
+    total_players = 0
+    max_total_players = 0
+    total_in_queue = 0
     for server in servers:
         if filter_by_game and filter_by_game != server['game']:
             continue
@@ -87,6 +94,9 @@ async def servers_stats(servers: list, filter_by_game: str = None):
         icons = f"{sl_emoji} {co_emoji} {ca_emoji} {afk_emoji} {pm_emoji}"
 
         invisible_char = "ㅤ"
+        total_players += server['players']
+        max_total_players += server['maxplayers']
+        total_in_queue += server['queue']
 
         fields.append(EmbedField(
             name=f"{status_emoji}{game_emoji} {name}",
@@ -97,7 +107,10 @@ async def servers_stats(servers: list, filter_by_game: str = None):
     return Embed(
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
-        description=await get_description(filter_by_game=filter_by_game),
+        description=await get_description(filter_by_game=filter_by_game,
+                                          total_players=total_players,
+                                          max_total_players=max_total_players,
+                                          total_in_queue=total_in_queue),
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         color=0x017af4,
         timestamp=str(datetime.utcnow()),
