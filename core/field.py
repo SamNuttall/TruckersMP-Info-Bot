@@ -1,6 +1,7 @@
 from interactions import Embed, EmbedField
 
-from core import emoji, utils
+from core import emoji, util
+from core import attribute as attr
 from core.emoji import Emoji
 
 

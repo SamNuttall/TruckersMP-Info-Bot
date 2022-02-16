@@ -1,7 +1,7 @@
 from interactions import Embed, EmbedField, EmbedFooter, EmbedImageStruct
 from datetime import datetime
 
-from core import fields as embed_fields
+from core import field as embed_fields
 
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 
