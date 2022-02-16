@@ -20,16 +20,17 @@ async def get_server_field(server: dict):
     if not server[attr.get(Server.online)]:
         players = "N/A"
 
-    sl_emoji = emoji.get(Emoji.SL_ON if server[attr.get(Server.speed_limiter)] else Emoji.SL_OFF)
-    co_emoji = emoji.get(Emoji.CO_ON if server[attr.get(Server.collisions)] else Emoji.CO_OFF)
-    ca_emoji = emoji.get(Emoji.CA_ON if server[attr.get(Server.cars_for_players)] else Emoji.CA_OFF)
-    afk_emoji = emoji.get(Emoji.AFK_ON if server[attr.get(Server.afk_enabled)] else Emoji.AFK_OFF)
-    pm_emoji = emoji.get(Emoji.PM) if server[attr.get(Server.promods)] else ""
-    icons = f"{sl_emoji} {co_emoji} {ca_emoji} {afk_emoji} {pm_emoji}"
+    icons = (
+        emoji.get(Emoji.SL_ON if server[attr.get(Server.speed_limiter)] else Emoji.SL_OFF),
+        emoji.get(Emoji.CO_ON if server[attr.get(Server.collisions)] else Emoji.CO_OFF),
+        emoji.get(Emoji.CA_ON if server[attr.get(Server.cars_for_players)] else Emoji.CA_OFF),
+        emoji.get(Emoji.AFK_ON if server[attr.get(Server.afk_enabled)] else Emoji.AFK_OFF),
+        emoji.get(Emoji.PM) if server[attr.get(Server.promods)] else ""
+    )
 
     return EmbedField(
         name=f"{status_emoji}{game_emoji} {name}",
-        value=f"**{status}:** {players}\n**In queue:** {queue}\n{icons}",
+        value=f"**{status}:** {players}\n**In queue:** {queue}\n{' '.join(icons)}",
         inline=True,
     )
 
