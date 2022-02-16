@@ -4,7 +4,6 @@ from core.web import get_request, validate_resp
 from cache import AsyncTTL, AsyncLRU
 
 
-
 @AsyncTTL(time_to_live=60, maxsize=1)
 async def get_servers():
     """
