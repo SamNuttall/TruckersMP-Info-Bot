@@ -35,3 +35,12 @@ def as_dict(emoji: Emoji):
     name, emoji_id = get(emoji)[2:-1].split(":")
     return {'name': name, 'id': emoji_id}
 
+
+TRAFFIC_SEVERITY = {
+    'Empty': f"{get(Emoji.T_DEF)} " * 4,
+    'Fluid': f"{get(Emoji.T_LOW)} " + f"{get(Emoji.T_DEF)}" * 3,
+    'Moderate': f"{get(Emoji.T_LOW)} {get(Emoji.T_MOD)} " + f"{get(Emoji.T_DEF)}" * 2,
+    'Congested': f"{get(Emoji.T_LOW)} {get(Emoji.T_MOD)} {get(Emoji.T_CON)} {get(Emoji.T_DEF)}",
+    'Heavy': f"{get(Emoji.T_LOW)} {get(Emoji.T_MOD)} {get(Emoji.T_CON)} {get(Emoji.T_HEV)}"
+}
+

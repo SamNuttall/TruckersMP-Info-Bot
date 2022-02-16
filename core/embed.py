@@ -1,8 +1,7 @@
 from interactions import Embed, EmbedField, EmbedFooter, EmbedImageStruct
 from datetime import datetime
 
-from core import emoji
-from core.emoji import Emoji
+from core import fields as embed_fields
 
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 
@@ -19,15 +18,6 @@ async def generic_error():
         title=f":neutral_face: Something went wrong...",
         color=0xFF0000
     )
-
-
-async def trim_name(name: str, max_chars: int = 8, add_dots: bool = True):
-    """Trims a string (server name) to a set length and adds ... to the string"""
-    if len(name) > max_chars:
-        name = name[:max_chars]
-        if add_dots:
-            name += "..."
-    return name
 
 
 async def format_fields(fields: list, expected_length: int = 9):
@@ -82,30 +72,11 @@ async def servers_stats(servers: list, filter_by_game: str = None, ingame_time: 
     for server in servers:
         if filter_by_game and filter_by_game != server['game']:
             continue
-        status_emoji = emoji.get(Emoji.UP if server['online'] else Emoji.DOWN)
-        game_emoji = emoji.get(Emoji.ETS2 if server['game'].upper() == "ETS2" else Emoji.ATS)
-        name = server['shortname'] if not server['event'] else await trim_name(server['name'])
-        status = "Online" if server['online'] else "Offline"
-        players = f"{server['players']}/{server['maxplayers']}" if server['online'] else "N/A"
-        queue = server['queue'] if server['online'] else "N/A"
-
-        sl_emoji = emoji.get(Emoji.SL_ON if server['speedlimiter'] else Emoji.SL_OFF)
-        co_emoji = emoji.get(Emoji.CO_ON if server['collisions'] else Emoji.CO_OFF)
-        ca_emoji = emoji.get(Emoji.CA_ON if server['carsforplayers'] else Emoji.CA_OFF)
-        afk_emoji = emoji.get(Emoji.AFK_ON if server['afkenabled'] else Emoji.AFK_OFF)
-        pm_emoji = emoji.get(Emoji.PM) if server['promods'] else ""
-        icons = f"{sl_emoji} {co_emoji} {ca_emoji} {afk_emoji} {pm_emoji}"
-
-        invisible_char = "ㅤ"
         total_players += server['players']
         max_total_players += server['maxplayers']
         total_in_queue += server['queue']
+        fields.append(await embed_fields.get_server_field(server))
 
-        fields.append(EmbedField(
-            name=f"{status_emoji}{game_emoji} {name}",
-            value=f"**{status}:** {players}\n**In queue:** {queue}\n{icons}",
-            inline=True,
-        ))
     fields = await format_fields(fields, 0)
     if not ingame_time:
         ingame_time = "Unknown"
@@ -135,21 +106,6 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
     """Takes a list of traffic locations and creates an embed from them"""
     fields = []
     filter_bys = (filter_by_server, filter_by_game)
-    severity_emoji = (
-        emoji.get(Emoji.T_DEF),
-        emoji.get(Emoji.T_LOW),
-        emoji.get(Emoji.T_MOD),
-        emoji.get(Emoji.T_CON),
-        emoji.get(Emoji.T_HEV)
-    )
-    se = severity_emoji
-    severity_icons = {
-        'Empty': f"{se[0]} " * 4,
-        'Fluid': f"{se[1]} " + f"{se[0]}" * 3,
-        'Moderate': f"{se[1]} {se[2]} " + f"{se[0]}" * 2,
-        'Congested': f"{se[1]} {se[2]} {se[3]} {se[0]}",
-        'Heavy': f"{se[1]} {se[2]} {se[3]} {se[4]}"
-    }
     for location in locations:
         add = True
         for filter_by in filter_bys:
@@ -157,27 +113,12 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
                 add = False
         if not add:
             continue
-
-        server = location['server']
-
-        name = await trim_name(location['name'], 17)
-        game_emoji = emoji.get(Emoji.ETS2 if location['game'].upper() == "ETS2" else Emoji.ATS)
-        server_name = server['short'] if "event" not in server['url'] else await trim_name(server['name'], 9)
-        players = location['players']
-        severity = severity_icons[location['severity']]
-
-        invisible_char = "ㅤ"
-
-        if players == 0:
+        if location['players'] == 0:
             break
-
-        fields.append(EmbedField(
-            name=name,
-            value=f"{game_emoji} **{server_name}\nPlayers:** {players} {invisible_char}\n{severity}",
-            inline=True,
-        ))
+        fields.append(await embed_fields.get_location_field(location))
         if len(fields) >= limit:
             break
+
     fields = await format_fields(fields, limit)
     return Embed(
         title=f":truck: TruckersMP | Highest Traffic Areas",
