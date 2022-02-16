@@ -1,4 +1,4 @@
-from interactions import Embed, EmbedField
+from interactions import EmbedField
 
 from core import emoji, util
 from core import attribute as attr
