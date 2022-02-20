@@ -2,6 +2,7 @@ import asyncio
 import dateutil.parser
 from core.web import get_request, validate_resp
 from cache import AsyncTTL, AsyncLRU
+from datetime import datetime, timezone, timedelta
 
 
 @AsyncTTL(time_to_live=60, maxsize=1)
@@ -26,30 +27,6 @@ async def get_servers():
         result['error'] = True
         return result
     result['servers'] = resp['response']
-    return result
-
-
-@AsyncTTL(time_to_live=60, maxsize=1)
-async def get_ingame_time():
-    """
-    Gets the in-game time
-
-    Returns:
-        dict =
-            error: bool = True if status not 200 or other error
-            result?: str = The in-game time in formatted 12h time
-    """
-    # Investigate implementation without TruckyApp
-    result = dict()
-    result['error'] = False
-    endpoint = "https://api.truckyapp.com/v2/truckersmp/time"
-    func_resp = await get_request(endpoint)
-    if not validate_resp(func_resp, ('response', )):
-        result['error'] = True
-        return result
-    resp = func_resp['resp']
-    time_data = resp['response']['calculated_game_time']
-    result['time'] = dateutil.parser.isoparse(time_data).strftime('%I:%M %p')
     return result
 
 
@@ -113,3 +90,44 @@ async def get_traffic(traffic_servers: list):
     result['traffic'] = traffic
     return result
 
+
+@AsyncTTL(time_to_live=5, maxsize=1)
+async def get_ingame_time():
+    """
+    Gets the approximate in-game time (local, no API)
+
+    Returns:
+        datetime = The approximate in-game time (only hour & min mostly important)
+    """
+    epoch = datetime(2015, 10, 25, 15, 48, 32, tzinfo=timezone.utc)  # From TruckersMP API docs
+    offset = timedelta(minutes=48, hours=15)  # This appears to align regardless of docs; Reason unknown
+    time_now = datetime.now(timezone.utc)
+
+    since_epoch = time_now - epoch
+    ingame_mins_since_epoch = timedelta(seconds=since_epoch.total_seconds() * 6)  # 10 real sec = 60 in-game sec (x*6)
+    game_time = epoch + ingame_mins_since_epoch + offset
+
+    return game_time
+
+
+@AsyncTTL(time_to_live=60, maxsize=1)
+async def get_ingame_time_from_api():
+    """
+    Gets the in-game time from TruckyApp API
+
+    Returns:
+        dict =
+            error: bool = True if status not 200 or other error
+            result?: datetime = The approximate in-game time
+    """
+    # Investigate implementation without TruckyApp
+    result = dict()
+    result['error'] = False
+    endpoint = "https://api.truckyapp.com/v2/truckersmp/time"
+    func_resp = await get_request(endpoint)
+    if not validate_resp(func_resp, ('response', )):
+        result['error'] = True
+        return result
+    resp = func_resp['resp']
+    result['time'] = resp['response']['calculated_game_time']
+    return result
