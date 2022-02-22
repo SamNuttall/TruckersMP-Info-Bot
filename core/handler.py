@@ -1,6 +1,7 @@
 import asyncio
 from interactions import CommandContext
-from core import assemble, data, embed
+from core import assemble, data, embed, format
+from datetime import datetime
 
 
 async def servers_cmd(ctx: CommandContext, server: int, game: str):
@@ -11,8 +12,11 @@ async def servers_cmd(ctx: CommandContext, server: int, game: str):
         return
     servers = server_data['servers']
     ingame_time = None
-    if not time_data['error']:
-        ingame_time = time_data['time']
+    if type(time_data) == datetime:
+        ingame_time = await format.format_time(time_data)
+    else:
+        if not time_data['error']:
+            ingame_time = await format.format_time(time_data['time'])
     if not server_id:
         await ctx.send(embeds=await embed.servers_stats(servers, game, ingame_time), ephemeral=True)
         return
