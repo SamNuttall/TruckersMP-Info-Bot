@@ -51,14 +51,14 @@ class OptionDescription(Enum):
 class Options(Enum):
     SERVERS = [
         Option(
-            type=get(OptionType.INTEGER),
+            type=OptionType.INTEGER,
             name=get(OptionName.SERVER),
             description=get(OptionDescription.SERVER),
             required=False,
             autocomplete=True
         ),
         Option(
-            type=get(OptionType.STRING),
+            type=OptionType.STRING,
             name=get(OptionName.GAME),
             description=get(OptionDescription.GAME),
             required=False,
@@ -67,21 +67,21 @@ class Options(Enum):
     ]
     TRAFFIC = [
         Option(
-            type=get(OptionType.STRING),
+            type=OptionType.STRING,
             name=get(OptionName.LOCATION),
             description=get(OptionDescription.LOCATION),
             required=False,
             autocomplete=True
         ),
         Option(
-            type=get(OptionType.STRING),
+            type=OptionType.STRING,
             name=get(OptionName.SERVER),
             description=get(OptionDescription.TRAFFIC_SERVER),
             required=False,
             autocomplete=True
         ),
         Option(
-            type=get(OptionType.STRING),
+            type=OptionType.STRING,
             name=get(OptionName.GAME),
             description=get(OptionDescription.TRAFFIC_GAME),
             required=False,

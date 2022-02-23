@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = getenv("APP_TOKEN")
-TEST_GUILD_ID = getenv("TEST_GUILD_ID")
+TEST_GUILD_ID = int(getenv("TEST_GUILD_ID"))
+
 bot = interactions.Client(token=TOKEN)
 
 
@@ -30,17 +31,17 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
     await h.traffic_cmd(ctx, location, server, game)
 
 
-@bot.autocomplete(c.get(c.OptionName.SERVER), command=c.get_command(bot, c.Name.SERVERS).id)
+@bot.autocomplete(command=c.get(c.Name.SERVERS), name=c.get(c.OptionName.SERVER))
 async def autocomplete_server(ctx, user_input: str = ""):
     await h.autocomplete_server(ctx, user_input)
 
 
-@bot.autocomplete(c.get(c.OptionName.LOCATION), command=c.get_command(bot, c.Name.TRAFFIC).id)
+@bot.autocomplete(command=c.get(c.Name.TRAFFIC), name=c.get(c.OptionName.LOCATION))
 async def autocomplete_traffic(ctx, user_input: str = ""):
     await h.autocomplete_traffic(ctx, user_input)
 
 
-@bot.autocomplete(c.get(c.OptionName.SERVER), command=c.get_command(bot, c.Name.TRAFFIC).id)
+@bot.autocomplete(command=c.get(c.Name.TRAFFIC), name=c.get(c.OptionName.SERVER))
 async def autocomplete_traffic_servers(ctx, user_input: str = ""):
     await h.autocomplete_traffic_servers(ctx, user_input)
 
