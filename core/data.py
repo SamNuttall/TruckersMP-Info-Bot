@@ -1,8 +1,11 @@
 import asyncio
-import dateutil.parser
+
 from core.web import get_request, validate_resp
 from cache import AsyncTTL, AsyncLRU
 from datetime import datetime, timezone, timedelta
+from interactions.base import get_logger
+
+logger = get_logger("general")
 
 
 @AsyncTTL(time_to_live=60, maxsize=1)
@@ -121,6 +124,7 @@ async def get_ingame_time_from_api():
             result?: datetime = The approximate in-game time
     """
     # Investigate implementation without TruckyApp
+    logger.debug("Got in-game time from TruckyApp API. Local implementation is recommended.")
     result = dict()
     result['error'] = False
     endpoint = "https://api.truckyapp.com/v2/truckersmp/time"
