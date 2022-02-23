@@ -43,7 +43,7 @@ async def get_location_field(location: dict):
     severity = emoji.TRAFFIC_SEVERITY[location[attr.get(Location.severity)]]
 
     server_name = server[attr.get(TrafficServer.short_name)]
-    if "event" not in server[attr.get(TrafficServer.url)]:
+    if "event" in server[attr.get(TrafficServer.url)]:
         server_name = await util.trim_string(server[attr.get(TrafficServer.name)], 9)
 
     return EmbedField(
