@@ -13,7 +13,7 @@ async def get_server_field(server: dict):
 
     name = server[Server.short_name]
     if server[Server.event]:
-        await util.trim_string(server[Server.name])
+        name = await util.trim_string(server[Server.name])
 
     players = f"{server[Server.players]}/{server[Server.max_players]}"
     if not server[Server.online]:
