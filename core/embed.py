@@ -2,6 +2,7 @@ from interactions import Embed, EmbedField, EmbedFooter, EmbedImageStruct
 from datetime import datetime
 
 from core import field as embed_fields
+from core.attribute import Server, ServerAttributes
 
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 
@@ -50,7 +51,7 @@ async def get_description(filter_by_server: str = None, filter_by_game: str = No
     """Get the description for an embed based on the filters"""
     description = f":pencil: **Filtered by "
     if filter_by_server:
-        description += f"server:** {filter_by_server.capitalize()}"
+        description += f"server:** {filter_by_server}"
     elif filter_by_game:
         description += f"game:** {filter_by_game}"
     else:
@@ -98,8 +99,45 @@ async def servers_stats(servers: list, filter_by_game: str = None, ingame_time: 
     )
 
 
-async def server_stats(server: dict):
-    """"""
+async def server_stats(server: dict, ingame_time: str = None):
+    """Takes a specific server and creates an embed from it"""
+    if not ingame_time:
+        ingame_time = "Unknown"
+    s = ServerAttributes(server, promods_if_disabled=":red_circle:")
+    description = await get_description(
+        filter_by_server=s.short_name.upper(),
+        ingame_time=ingame_time
+    )
+    speed_limiter = "**Speed Limiter:** Enabled" if s.speed_limiter else "**Speed Limiter:** Disabled"
+    collisions = "**Collisions:** Enabled" if s.collisions else "**Collisions:** Disabled"
+    cars = "**Cars for Players:** Enabled" if s.cars_for_players else "**Cars for Players:** Disabled"
+    afk_kick = "**AFK Kick:** Enabled" if s.afk_enabled else "**AFK Kick:** Disabled"
+    promods = "**Promods:** Enabled" if s.promods else "**Promods:** Disabled"
+    description += (
+        "\n\n"
+        f"> :desktop: **{s.name}** ({s.short_name})\n"
+        f"> {s.status_emoji} **Status:** {s.status}\n"
+        f"> {s.game_emoji} **Game:** {s.game}\n"
+        f"> :busts_in_silhouette: **Players:** {s.players} ({s.percent_players}%)\n"
+        f"> :watch: **In Queue:** {s.queue}\n"
+        f"> {s.speed_limiter_icon} {speed_limiter}\n"
+        f"> {s.collisions_icon} {collisions}\n"
+        f"> {s.cars_for_players_icon} {cars}\n"
+        f"> {s.afk_enabled_icon} {afk_kick}\n"
+        f"> {s.promods_icon} {promods}"
+    )
+    description += "\n:tada: **Note:** Event Server" if s.is_event else ""
+    return Embed(
+        title=f":truck: TruckersMP | Server Stats",
+        url="https://truckersmp.com/status",
+        description=description,
+        thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
+        color=0x017af4,
+        timestamp=str(datetime.utcnow()),
+        footer=EmbedFooter(
+            text="Information provided by TruckersMP",
+        )
+    )
 
 
 async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str, limit: int = 9):
@@ -122,7 +160,7 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
     fields = await format_fields(fields, limit)
     return Embed(
         title=f":truck: TruckersMP | Highest Traffic Areas",
-        description=await get_description(filter_by_server, filter_by_game),
+        description=await get_description(filter_by_server.capitalize(), filter_by_game),
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         url="https://traffic.krashnz.com/",
         color=0x017af4,

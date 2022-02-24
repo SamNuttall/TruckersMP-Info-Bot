@@ -29,7 +29,7 @@ async def servers_cmd(ctx: CommandContext, server: int, game: str):
         if s['id'] == server_id:
             server = s
     if server:
-        await ctx.send(embeds=await embed.server_stats(server), ephemeral=True)
+        await ctx.send(embeds=await embed.server_stats(server, ingame_time), ephemeral=True)
         return
     await ctx.send(embeds=await embed.item_not_found("Specified TruckersMP server"), ephemeral=True)
 
