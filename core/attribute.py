@@ -1,4 +1,4 @@
-from core.emoji import Emoji
+from core.emoji import Emoji, TRAFFIC_SEVERITY
 from core import util
 
 
@@ -102,3 +102,25 @@ class ServerAttributes:
             self.cars_for_players_icon, self.afk_enabled_icon,
             self.promods_icon
         )
+
+
+class LocationAttributes:
+
+    def __init__(self, location):
+        self.server = location[Location.server]
+        self.name = location[Location.name]
+        self.trimmed_name = util.trim_string(self.name, 17)
+        self.game = location[Location.game].upper()
+        self.game_emoji = Emoji.ETS2 if self.game == "ETS2" else Emoji.ATS
+        self.players = location[Location.players]
+
+        self.severity = location[Location.severity]
+        self.severity_icon = TRAFFIC_SEVERITY[self.severity][0]
+        self.severity_bar = TRAFFIC_SEVERITY[self.severity][1]
+
+        self.server_name = self.server[TrafficServer.name]
+        self.server_short_name = self.server[TrafficServer.short_name]
+
+        self.server_formatted_name = self.server_short_name
+        if "event" in self.server[TrafficServer.url]:
+            self.server_formatted_name = util.trim_string(self.server_name, 9)

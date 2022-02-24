@@ -30,10 +30,14 @@ def as_dict(emoji: str):
 
 
 TRAFFIC_SEVERITY = {
-    'Empty': f"{Emoji.T_DEF} " * 4,
-    'Fluid': f"{Emoji.T_LOW} " + f"{Emoji.T_DEF}" * 3,
-    'Moderate': f"{Emoji.T_LOW} {Emoji.T_MOD} " + f"{Emoji.T_DEF}" * 2,
-    'Congested': f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_DEF}",
-    'Heavy': f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_HEV}"
+    """
+    Contains a tuple for each dictionary value. 
+    Item 1 being a singular emoji, item 2 being 4 emojis (like progress bars)
+    """
+    'Empty': (Emoji.T_DEF, f"{Emoji.T_DEF} " * 4),
+    'Fluid': (Emoji.T_LOW, f"{Emoji.T_LOW} " + f"{Emoji.T_DEF}" * 3),
+    'Moderate': (Emoji.T_MOD, f"{Emoji.T_LOW} {Emoji.T_MOD} " + f"{Emoji.T_DEF}" * 2),
+    'Congested': (Emoji.T_CON, f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_DEF}"),
+    'Heavy': (Emoji.T_HEV, f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_HEV}")
 }
 

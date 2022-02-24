@@ -158,9 +158,11 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
             break
 
     fields = await format_fields(fields, limit)
+    if filter_by_server:
+        filter_by_server = filter_by_server.capitalize()
     return Embed(
         title=f":truck: TruckersMP | Highest Traffic Areas",
-        description=await get_description(filter_by_server.capitalize(), filter_by_game),
+        description=await get_description(filter_by_server, filter_by_game),
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         url="https://traffic.krashnz.com/",
         color=0x017af4,
@@ -170,3 +172,6 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
             text="Information provided by Krashnz via TruckyApp",
         )
     )
+
+async def location_stats(location: dict):
+    pass
