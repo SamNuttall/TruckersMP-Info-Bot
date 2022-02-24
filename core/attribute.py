@@ -1,8 +1,5 @@
-from enum import Enum
-from typing import Union
 
-
-class Server(Enum):
+class Server:
     """Stores the attributes (even if not used) of a server"""
     id = "id"  # int
     game = "game"  # str
@@ -28,7 +25,7 @@ class Server(Enum):
     sync_delay = "syncdelay"  # int
 
 
-class TrafficServer(Enum):
+class TrafficServer:
     """Stores the attributes (even if not used) of a traffic server"""
     name = "name"  # str
     url = "url"  # str
@@ -36,7 +33,7 @@ class TrafficServer(Enum):
     game = "game"  # str
 
 
-class Location(Enum):
+class Location:
     """Stores the attributes (even if not used) of a location"""
     name = "name"  # str
     players = "players"  # int
@@ -51,8 +48,3 @@ class Location(Enum):
     layer_id = "layerID"  # str
     server = "server"  # dict (added by self)
     game = "game"  # str (added by self)
-
-
-def get(attribute: Union[Server, TrafficServer, Location]):
-    """Gets the raw value of an attribute"""
-    return attribute.value

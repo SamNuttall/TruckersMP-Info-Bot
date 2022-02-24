@@ -1,9 +1,7 @@
-from enum import Enum
-
 USE_EXCLUSIVE = True
 
 
-class Emoji(Enum):
+class Emoji:
     """Stores emoji as strings in the format <:name:id>"""
     UP = "<:Server_Online:856556236137037835>"
     DOWN = "<:Server_Offline:856560729033539594>"
@@ -25,22 +23,17 @@ class Emoji(Enum):
     T_HEV = "<:Heavy_Traffic:856988618340958208>"
 
 
-def get(emoji: Emoji):
-    """Gets the raw value of an emoji"""
-    return emoji.value
-
-
-def as_dict(emoji: Emoji):
+def as_dict(emoji: str):
     """Converts an Emoji into a dictionary"""
-    name, emoji_id = get(emoji)[2:-1].split(":")
+    name, emoji_id = emoji[2:-1].split(":")
     return {'name': name, 'id': emoji_id}
 
 
 TRAFFIC_SEVERITY = {
-    'Empty': f"{get(Emoji.T_DEF)} " * 4,
-    'Fluid': f"{get(Emoji.T_LOW)} " + f"{get(Emoji.T_DEF)}" * 3,
-    'Moderate': f"{get(Emoji.T_LOW)} {get(Emoji.T_MOD)} " + f"{get(Emoji.T_DEF)}" * 2,
-    'Congested': f"{get(Emoji.T_LOW)} {get(Emoji.T_MOD)} {get(Emoji.T_CON)} {get(Emoji.T_DEF)}",
-    'Heavy': f"{get(Emoji.T_LOW)} {get(Emoji.T_MOD)} {get(Emoji.T_CON)} {get(Emoji.T_HEV)}"
+    'Empty': f"{Emoji.T_DEF} " * 4,
+    'Fluid': f"{Emoji.T_LOW} " + f"{Emoji.T_DEF}" * 3,
+    'Moderate': f"{Emoji.T_LOW} {Emoji.T_MOD} " + f"{Emoji.T_DEF}" * 2,
+    'Congested': f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_DEF}",
+    'Heavy': f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_HEV}"
 }
 
