@@ -1,3 +1,6 @@
+from core.emoji import Emoji
+from core import util
+
 
 class Server:
     """Stores the attributes (even if not used) of a server"""
@@ -48,3 +51,54 @@ class Location:
     layer_id = "layerID"  # str
     server = "server"  # dict (added by self)
     game = "game"  # str (added by self)
+
+
+class ServerAttributes:
+    """Format the attributes of a specific server ready for use in embeds"""
+
+    def __init__(self, server,
+                 online_str="Online",
+                 offline_str="Offline",
+                 players_if_offline_str="N/A",
+                 queue_if_offline_str="N/A",
+                 promods_if_disabled=""
+                 ):
+        self.is_online = server[Server.online]
+        self.game = server[Server.game].upper()
+        self.status_emoji = Emoji.UP if self.is_online else Emoji.DOWN
+        self.game_emoji = Emoji.ETS2 if self.game == "ETS2" else Emoji.ATS
+        self.status = online_str if self.is_online else offline_str
+        self.queue = server[Server.queue] if self.is_online else queue_if_offline_str
+
+        self.short_name = server[Server.short_name]
+        self.name = server[Server.name]
+        self.is_event = server[Server.event]
+
+        self.formatted_name = self.short_name
+        if self.is_event:
+            self.formatted = util.trim_string(self.name)
+
+        self.current_players = server[Server.players]
+        self.max_players = server[Server.max_players]
+        self.percent_players = int((self.current_players / self.max_players) * 100)
+        self.players = f"{self.current_players}/{self.max_players}"
+        if not self.is_online:
+            self.players = players_if_offline_str
+
+        self.speed_limiter = server[Server.speed_limiter]
+        self.collisions = server[Server.collisions]
+        self.cars_for_players = server[Server.cars_for_players]
+        self.afk_enabled = server[Server.afk_enabled]
+        self.promods = server[Server.promods]
+
+        self.speed_limiter_icon = Emoji.SL_ON if self.speed_limiter else Emoji.SL_OFF
+        self.collisions_icon = Emoji.CO_ON if self.collisions else Emoji.CO_OFF
+        self.cars_for_players_icon = Emoji.CA_ON if self.cars_for_players else Emoji.CA_OFF
+        self.afk_enabled_icon = Emoji.AFK_ON if self.afk_enabled else Emoji.AFK_OFF
+        self.promods_icon = Emoji.PM if self.promods else promods_if_disabled
+
+        self.icons = (
+            self.speed_limiter_icon, self.collisions_icon,
+            self.cars_for_players_icon, self.afk_enabled_icon,
+            self.promods_icon
+        )
