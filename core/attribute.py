@@ -76,7 +76,7 @@ class ServerAttributes:
 
         self.formatted_name = self.short_name
         if self.is_event:
-            self.formatted = util.trim_string(self.name)
+            self.formatted_name = util.trim_string(self.name)
 
         self.current_players = server[Server.players]
         self.max_players = server[Server.max_players]
