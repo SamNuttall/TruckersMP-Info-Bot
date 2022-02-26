@@ -126,7 +126,7 @@ async def server_stats(server: dict, ingame_time: str = None):
         f"> {s.afk_enabled_icon} {afk_kick}\n"
         f"> {s.promods_icon} {promods}"
     )
-    description += "\n:tada: **Note:** Event Server" if s.is_event else ""
+    description += "\n> :tada: **Note:** Event Server" if s.is_event else ""
     return Embed(
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
