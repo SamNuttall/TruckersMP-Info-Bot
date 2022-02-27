@@ -125,6 +125,7 @@ async def server_stats(server: dict, ingame_time: str = None):
         f"> {s.cars_for_players_icon} {cars}\n"
         f"> {s.afk_enabled_icon} {afk_kick}\n"
         f"> {s.promods_icon} {promods}"
+        f"\n> :label: **Type:** {s.type}"
     )
     description += "\n> :tada: **Note:** Event Server" if s.is_event else ""
     return Embed(

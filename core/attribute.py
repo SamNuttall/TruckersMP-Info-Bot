@@ -1,5 +1,6 @@
 from core.emoji import Emoji, TRAFFIC_SEVERITY
 from core import util
+import re
 
 
 class Server:
@@ -53,6 +54,40 @@ class Location:
     game = "game"  # str (added by self)
 
 
+class ServerType:
+    """Unofficial way of storing the type of server."""
+    simulation = "Simulation"
+    arcade = "Arcade"
+    community_event = "Community Event"
+    official_event = "Official Event"
+    unknown = "Unknown"
+
+
+def get_server_type(name: str, is_event: bool = False):
+    """
+    Get a servers "type" depending on it's name.
+    This shouldn't be relied for anything vital and may be inaccurate, espeically if TruckersMP changes server names.
+
+    Returns:
+        ServerType: str
+    """
+    if not is_event:
+        simulation_names = ("simulation", "promods")  # regex
+        arcade_names = ("arcade",)  # regex
+        is_simulation_check = any(re.search(sim_name, name.lower()) for sim_name in simulation_names)
+        is_arcade_match = any(re.search(arc_name, name.lower()) for arc_name in arcade_names)
+        if is_arcade_match:  # First as "promods arcade" also passes sim check
+            return ServerType.arcade
+        if is_simulation_check:
+            return ServerType.simulation
+        return ServerType.unknown
+    official_names = ("^real operations", "^truckersmp official")  # regex
+    is_official_check = any(re.search(official_name, name.lower()) for official_name in official_names)
+    if is_official_check:
+        return ServerType.official_event
+    return ServerType.community_event
+
+
 class ServerAttributes:
     """Format the attributes of a specific server ready for use in embeds"""
 
@@ -73,6 +108,7 @@ class ServerAttributes:
         self.short_name = server[Server.short_name]
         self.name = server[Server.name]
         self.is_event = server[Server.event]
+        self.type = get_server_type(self.name, self.is_event)
 
         self.formatted_name = self.short_name
         if self.is_event:
