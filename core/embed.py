@@ -2,6 +2,7 @@ from interactions import Embed, EmbedField, EmbedFooter, EmbedImageStruct
 from datetime import datetime
 
 from core import field as embed_fields
+from core import util
 from core.attribute import Server, ServerAttributes
 
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
@@ -45,20 +46,27 @@ async def format_fields(fields: list, expected_length: int = 9):
     return fields
 
 
-async def get_description(filter_by_server: str = None, filter_by_game: str = None,
+async def get_description(filter_by_server: str = None, filter_by_game: str = None, filter_by_location: str = None,
                           total_players: int = None, max_total_players: int = None,
-                          total_in_queue: int = None, ingame_time: str = None):
+                          total_in_queue: int = None, ingame_time: str = None,
+                          players_in_locations: int = None, players_in_traffic: int = None):
     """Get the description for an embed based on the filters"""
     description = f":pencil: **Filtered by "
     if filter_by_server:
         description += f"server:** {filter_by_server}"
     elif filter_by_game:
         description += f"game:** {filter_by_game}"
+    elif filter_by_location:
+        description += f"location:** {filter_by_location}"
     else:
         description = ""
     if total_players is not None and max_total_players is not None and total_in_queue is not None:
         description += (f"\n**:busts_in_silhouette: Total Players:** " +
                         f"{total_players}/{max_total_players} ({total_in_queue} in queue)")
+    if players_in_locations is not None:
+        description += f"\n**:busts_in_silhouette: Players in Locations:** {players_in_locations}"
+    if players_in_traffic is not None:
+        description += f"\n**:truck: Players in Traffic Jams:** {players_in_traffic}"
     if ingame_time:
         description += f"\n**:alarm_clock: In-game time:** {ingame_time}"
     return description
@@ -127,7 +135,6 @@ async def server_stats(server: dict, ingame_time: str = None):
         f"> {s.promods_icon} {promods}"
         f"\n> :label: **Type:** {s.type}"
     )
-    description += "\n> :tada: **Note:** Event Server" if s.is_event else ""
     return Embed(
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
@@ -141,29 +148,40 @@ async def server_stats(server: dict, ingame_time: str = None):
     )
 
 
-async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str, limit: int = 9):
+async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
+                        filter_by_location: str, limit: int = 9):
     """Takes a list of traffic locations and creates an embed from them"""
     fields = []
-    filter_bys = (filter_by_server, filter_by_game)
+    filter_bys = (filter_by_server, filter_by_game, filter_by_location)
+    players_in_locations = 0
+    players_in_traffic = 0
     for location in locations:
         add = True
         for filter_by in filter_bys:
-            if filter_by and filter_by not in (location['game'], location['server']['url']):
+            if filter_by and filter_by not in (location['game'], location['server']['url'], location['name']):
                 add = False
         if not add:
             continue
         if location['players'] == 0:
             break
         fields.append(await embed_fields.get_location_field(location))
+        players_in_locations += location['players']
+        players_in_traffic += location['playersInvolvedInTrafficJams']
         if len(fields) >= limit:
             break
 
     fields = await format_fields(fields, limit)
     if filter_by_server:
         filter_by_server = filter_by_server.capitalize()
+    if filter_by_location:
+        filter_by_location = util.trim_string(filter_by_location, 20)
     return Embed(
         title=f":truck: TruckersMP | Highest Traffic Areas",
-        description=await get_description(filter_by_server, filter_by_game),
+        description=await get_description(filter_by_server,
+                                          filter_by_game,
+                                          filter_by_location,
+                                          players_in_locations=players_in_locations,
+                                          players_in_traffic=players_in_traffic),
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         url="https://traffic.krashnz.com/",
         color=0x017af4,
@@ -174,5 +192,11 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
         )
     )
 
-async def location_stats(location: dict):
-    pass
+
+async def location_stats(locations: list, filter_by: str):
+    matched_locations = []
+    for location in locations:
+        if location.name == filter_by:
+            matched_locations.append(location)
+
+    description = await get_description()

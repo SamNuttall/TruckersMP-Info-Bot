@@ -44,9 +44,7 @@ async def traffic_cmd(ctx, location: str, server: str, game: str):
     if traffic['error']:
         await ctx.send(embeds=await embed.generic_error(), ephemeral=True)
         return
-    if not location:
-        await ctx.send(embeds=await embed.traffic_stats(traffic['traffic'], server, game), ephemeral=True)
-        return
+    await ctx.send(embeds=await embed.traffic_stats(traffic['traffic'], server, game, location), ephemeral=True)
 
 
 async def autocomplete_server(ctx, user_input: str):
