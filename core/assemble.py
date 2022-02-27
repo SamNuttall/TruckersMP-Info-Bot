@@ -91,7 +91,7 @@ async def get_location_choices(locations: list, search: str = "", maximum: int =
         if location['name'] not in added_locations:
             choice_list.append(Choice(
                 name=f"{location['name']} ({location['country']}) ({location['game']})",
-                value=location['layerID']
+                value=location['name']
             ))
             added_locations.append(location['name'])
     return choice_list
