@@ -66,7 +66,7 @@ class ServerType:
 def get_server_type(name: str, is_event: bool = False):
     """
     Get a servers "type" depending on it's name.
-    This shouldn't be relied for anything vital and may be inaccurate, espeically if TruckersMP changes server names.
+    This shouldn't be relied for anything vital and may be inaccurate, especially if TruckersMP changes server names.
 
     Returns:
         ServerType: str
