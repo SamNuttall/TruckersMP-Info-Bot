@@ -1,12 +1,6 @@
 import interactions
 from interactions import Option, OptionType
 from core import assemble
-from enum import Enum
-
-
-def get(enum):
-    """Gets the raw value of any Enum"""
-    return enum.value
 
 
 def get_command(bot: interactions.Client, command_name):
@@ -20,27 +14,27 @@ def get_command(bot: interactions.Client, command_name):
         ApplicationCommand
     """
     return bot._http.cache.interactions.get(
-        get(command_name)
+        command_name
     )
 
 
-class Name(Enum):
+class Name:
     SERVERS = "servers"
     TRAFFIC = "traffic"
 
 
-class Description(Enum):
+class Description:
     SERVERS = "Get information about TruckersMP server(s)"
     TRAFFIC = "Get information about traffic in-game"
 
 
-class OptionName(Enum):
+class OptionName:
     SERVER = "server"
     GAME = "game"
     LOCATION = "location"
 
 
-class OptionDescription(Enum):
+class OptionDescription:
     SERVER = "Get information for a specific server only"
     GAME = "Get information for servers of a particular game only"
     LOCATION = "Get traffic for a specific location only"
@@ -48,19 +42,19 @@ class OptionDescription(Enum):
     TRAFFIC_GAME = "Get traffic for servers of a particular game only"
 
 
-class Options(Enum):
+class Options:
     SERVERS = [
         Option(
             type=OptionType.INTEGER,
-            name=get(OptionName.SERVER),
-            description=get(OptionDescription.SERVER),
+            name=OptionName.SERVER,
+            description=OptionDescription.SERVER,
             required=False,
             autocomplete=True
         ),
         Option(
             type=OptionType.STRING,
-            name=get(OptionName.GAME),
-            description=get(OptionDescription.GAME),
+            name=OptionName.GAME,
+            description=OptionDescription.GAME,
             required=False,
             choices=assemble.get_game_choices()
         )
@@ -68,22 +62,22 @@ class Options(Enum):
     TRAFFIC = [
         Option(
             type=OptionType.STRING,
-            name=get(OptionName.LOCATION),
-            description=get(OptionDescription.LOCATION),
+            name=OptionName.LOCATION,
+            description=OptionDescription.LOCATION,
             required=False,
             autocomplete=True
         ),
         Option(
             type=OptionType.STRING,
-            name=get(OptionName.SERVER),
-            description=get(OptionDescription.TRAFFIC_SERVER),
+            name=OptionName.SERVER,
+            description=OptionDescription.TRAFFIC_SERVER,
             required=False,
             autocomplete=True
         ),
         Option(
             type=OptionType.STRING,
-            name=get(OptionName.GAME),
-            description=get(OptionDescription.TRAFFIC_GAME),
+            name=OptionName.GAME,
+            description=OptionDescription.TRAFFIC_GAME,
             required=False,
             choices=assemble.get_game_choices()
         )

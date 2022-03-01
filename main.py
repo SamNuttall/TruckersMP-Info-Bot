@@ -34,36 +34,36 @@ async def on_ready():
 
 
 @bot.command(
-    name=c.get(c.Name.SERVERS),
-    description=c.get(c.Description.SERVERS),
+    name=c.Name.SERVERS,
+    description=c.Description.SERVERS,
     scope=TEST_GUILD_ID,
-    options=c.get(c.Options.SERVERS)
+    options=c.Options.SERVERS
 )
 async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game: str = None):
     await h.servers_cmd(ctx, server, game)
 
 
 @bot.command(
-    name=c.get(c.Name.TRAFFIC),
-    description=c.get(c.Description.TRAFFIC),
+    name=c.Name.TRAFFIC,
+    description=c.Description.TRAFFIC,
     scope=TEST_GUILD_ID,
-    options=c.get(c.Options.TRAFFIC)
+    options=c.Options.TRAFFIC
 )
 async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
     await h.traffic_cmd(ctx, location, server, game)
 
 
-@bot.autocomplete(command=c.get(c.Name.SERVERS), name=c.get(c.OptionName.SERVER))
+@bot.autocomplete(command=c.Name.SERVERS, name=c.OptionName.SERVER)
 async def autocomplete_server(ctx, user_input: str = ""):
     await h.autocomplete_server(ctx, user_input)
 
 
-@bot.autocomplete(command=c.get(c.Name.TRAFFIC), name=c.get(c.OptionName.LOCATION))
+@bot.autocomplete(command=c.Name.TRAFFIC, name=c.OptionName.LOCATION)
 async def autocomplete_traffic(ctx, user_input: str = ""):
     await h.autocomplete_traffic(ctx, user_input)
 
 
-@bot.autocomplete(command=c.get(c.Name.TRAFFIC), name=c.get(c.OptionName.SERVER))
+@bot.autocomplete(command=c.Name.TRAFFIC, name=c.OptionName.SERVER)
 async def autocomplete_traffic_servers(ctx, user_input: str = ""):
     await h.autocomplete_traffic_servers(ctx, user_input)
 
