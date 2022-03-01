@@ -47,6 +47,14 @@ async def traffic_cmd(ctx, location: str, server: str, game: str):
     await ctx.send(embeds=await embed.traffic_stats(traffic['traffic'], server, game, location), ephemeral=True)
 
 
+async def player_cmd(ctx, player_id: int, player_name: str):
+    """Pending implementation"""
+
+
+async def events_cmd(ctx, event_id: int):
+    """Pending implementation"""
+
+
 async def autocomplete_server(ctx, user_input: str):
     logger.debug(f"Handle Autocomplete Request: servers, guild {ctx.guild_id}, user {ctx.author.user.id}")
     servers = await data.get_servers()

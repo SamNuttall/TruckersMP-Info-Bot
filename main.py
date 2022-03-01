@@ -53,6 +53,26 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
     await h.traffic_cmd(ctx, location, server, game)
 
 
+@bot.command(
+    name=c.Name.PLAYER,
+    description=c.Description.PLAYER,
+    scope=TEST_GUILD_ID,
+    options=c.Options.PLAYER
+)
+async def player_cmd(ctx: interactions.CommandContext, id: int = None, player_name: str = None):
+    await h.player_cmd(ctx, id, player_name)
+
+
+@bot.command(
+    name=c.Name.EVENTS,
+    description=c.Description.EVENTS,
+    scope=TEST_GUILD_ID,
+    options=c.Options.EVENTS
+)
+async def events_cmd(ctx: interactions.CommandContext, id: int = None):
+    await h.events_cmd(ctx, id)
+
+
 @bot.autocomplete(command=c.Name.SERVERS, name=c.OptionName.SERVER)
 async def autocomplete_server(ctx, user_input: str = ""):
     await h.autocomplete_server(ctx, user_input)
