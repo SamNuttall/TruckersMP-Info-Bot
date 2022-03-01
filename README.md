@@ -36,5 +36,7 @@
 
 <h2>Credits</h2>
 <p>Alfie relies on the following APIs: </p>
+<ul>
 <li><a href="https://stats.truckersmp.com/api">TruckersMP</a></li>
 <li><a href="https://api.truckyapp.com/">TruckyApp</a></li>
+</ul>
