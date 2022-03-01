@@ -20,7 +20,7 @@
 <img alt="Search for location" src="https://i.imgur.com/W7goL82.png" />
 <p><b>Responses:</b> clean, detailed & modern</p>
 <img alt="Servers embed response" src="https://i.imgur.com/L9yt33n.png" />
-<img alt="Traffic embed response" src="https://i.imgur.com/EaRty5D.png" />
+<img alt="Traffic embed response" src="https://i.imgur.com/KZKOZEX.png" />
 <img alt="Server embed response" src="https://i.imgur.com/y3wZEqY.png" />
 
 <h2>Install</h2>

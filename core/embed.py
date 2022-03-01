@@ -188,7 +188,7 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
         timestamp=str(datetime.utcnow()),
         fields=fields,
         footer=EmbedFooter(
-            text="Information provided by Krashnz via TruckyApp",
+            text="Information provided by TruckyApp",
         )
     )
 
