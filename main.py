@@ -5,6 +5,7 @@ from core import startup
 from os import getenv
 from dotenv import load_dotenv
 from interactions.base import get_logger
+import config
 import logging
 
 logging.basicConfig(filename="log.log",
@@ -19,9 +20,16 @@ logger.setLevel(logging.DEBUG)
 logger.debug("Starting bot")
 load_dotenv()
 TOKEN = getenv("APP_TOKEN")
-TEST_GUILD_ID = int(getenv("TEST_GUILD_ID"))
 
-bot = interactions.Client(token=TOKEN)
+bot = interactions.Client(token=TOKEN,
+                          presence=interactions.ClientPresence(
+                              activities=(interactions.PresenceActivity(
+                                  name="TruckersMP Stats",
+                                  type=interactions.PresenceActivityType.WATCHING
+                              ),),
+                              status=interactions.StatusType.ONLINE
+                          )
+                          )
 
 if not startup.checks(TOKEN):
     print("Failed startup checks; Check log file for info")
@@ -36,7 +44,7 @@ async def on_ready():
 @bot.command(
     name=c.Name.SERVERS,
     description=c.Description.SERVERS,
-    scope=TEST_GUILD_ID,
+    scope=config.TEST_GUILD_ID,
     options=c.Options.SERVERS
 )
 async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game: str = None):
@@ -46,7 +54,7 @@ async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game
 @bot.command(
     name=c.Name.TRAFFIC,
     description=c.Description.TRAFFIC,
-    scope=TEST_GUILD_ID,
+    scope=config.TEST_GUILD_ID,
     options=c.Options.TRAFFIC
 )
 async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
@@ -56,7 +64,7 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
 @bot.command(
     name=c.Name.PLAYER,
     description=c.Description.PLAYER,
-    scope=TEST_GUILD_ID,
+    scope=config.TEST_GUILD_ID,
     options=c.Options.PLAYER
 )
 async def player_cmd(ctx: interactions.CommandContext, id: int = None, player_name: str = None):
@@ -66,7 +74,7 @@ async def player_cmd(ctx: interactions.CommandContext, id: int = None, player_na
 @bot.command(
     name=c.Name.EVENTS,
     description=c.Description.EVENTS,
-    scope=TEST_GUILD_ID,
+    scope=config.TEST_GUILD_ID,
     options=c.Options.EVENTS
 )
 async def events_cmd(ctx: interactions.CommandContext, id: int = None):

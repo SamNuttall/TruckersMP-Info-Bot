@@ -1,0 +1,8 @@
+# The following file is an example which works as the default config file.
+# Create a copy named config.py and edit options as suitable.
+
+# Provide a guild ID here to set commands to guild only. Otherwise, set to None
+TEST_GUILD_ID = None
+
+# Whether responses to slash commands should be only be shown to the command author/instigator
+EPHEMERAL_RESPONSES = False
