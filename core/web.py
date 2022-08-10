@@ -21,6 +21,13 @@ async def get_request(url: str, headers: dict = None, params: dict = None, timeo
     """
     result = dict()
     result['error'] = False
+
+    user_agent = "Mozilla/5.0"
+    if headers is None:
+        headers = {'User-Agent': user_agent}  # Some APIs want a user-agent, otherwise will return 403
+    else:
+        headers['User-Agent'] = user_agent
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, params=params, timeout=timeout) as resp:
@@ -28,7 +35,7 @@ async def get_request(url: str, headers: dict = None, params: dict = None, timeo
                 if resp.status == 200:
                     result['resp'] = await resp.json()
                 if 'resp' not in result:
-                    logger.warning(f"Get request not status 200. Having to return error")
+                    logger.warning(f"Get request to {url} not status 200 ({resp.status} instead)!")
                     result['error'] = True
     except (aiohttp.ClientError, asyncio.TimeoutError, aiohttp.ServerTimeoutError) as e:
         logger.warning(f"Unavoidably (probably) failed to make get request: {e}")
