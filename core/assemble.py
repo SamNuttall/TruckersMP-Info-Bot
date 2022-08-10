@@ -5,14 +5,20 @@ from cache import AsyncLRU
 
 async def add_sim_score(list_of_dict: list, search: str, key: str):
     """
-    Adds a similarity score to dictionaries in a list based on search
+    Adds a similarity score key + value to dictionaries in a list based on a search string
+    The search string is matched against the inputted key value per dictionary.
 
     Args:
         list_of_dict: list = list of dicts containing key
         search: str = value to compare key with
         key: str = value to compare search to
     Returns:
-        list: modified list of dictionaries
+        list: modified list of dictionaries new keys:
+            - sim_score: entire string *
+            - first_sim_score: first word *
+            - trim_sim_score: any text before an open bracket "(" *
+            - contains: 1 if the search string is contained within the value
+            * similarity marked by float between 0 & 1 (1 being most similar)
     """
     for dictionary in list_of_dict:
         dictionary['sim_score'] = SequenceMatcher(None, dictionary[key], search).ratio()
