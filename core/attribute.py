@@ -3,32 +3,6 @@ from core import util
 import re
 
 
-class Server:
-    """Stores the attributes (even if not used) of a server"""
-    id = "id"  # int
-    game = "game"  # str
-    ip = "ip"  # str
-    port = "port"  # int
-    name = "name"  # str
-    short_name = "shortname"  # str
-    id_prefix = "idprefix"  # str
-    online = "online"  # bool
-    players = "players"  # int
-    queue = "queue"  # int
-    max_players = "maxplayers"  # int
-    map_id = "mapid"  # int
-    display_order = "displayorder"  # int
-    speed_limiter = "speedlimiter"  # int
-    collisions = "collisions"  # bool
-    cars_for_players = "carsforplayers"  # bool
-    police_cars_for_players = "policecarsforplayers"  # bool
-    afk_enabled = "afkenabled"  # bool
-    event = "event"  # bool
-    special_event = "specialEvent"  # bool
-    promods = "promods"  # bool
-    sync_delay = "syncdelay"  # int
-
-
 class TrafficServer:
     """Stores the attributes (even if not used) of a traffic server"""
     name = "name"  # str
@@ -89,7 +63,7 @@ def get_server_type(name: str, is_event: bool = False):
 
 
 class ServerAttributes:
-    """Format the attributes of a specific server ready for use in embeds"""
+    """Add format attributes of a specific server ready for use in embeds"""
 
     def __init__(self, server,
                  online_str="Online",
@@ -98,34 +72,34 @@ class ServerAttributes:
                  queue_if_offline_str="N/A",
                  promods_if_disabled=""
                  ):
-        self.is_online = server[Server.online]
-        self.game = server[Server.game].upper()
+        self.is_online = server.online
+        self.game = server.game.upper()
         self.status_emoji = Emoji.UP if self.is_online else Emoji.DOWN
         self.game_emoji = Emoji.ETS2 if self.game == "ETS2" else Emoji.ATS
         self.status = online_str if self.is_online else offline_str
-        self.queue = server[Server.queue] if self.is_online else queue_if_offline_str
+        self.queue = server.queue if self.is_online else queue_if_offline_str
 
-        self.short_name = server[Server.short_name]
-        self.name = server[Server.name]
-        self.is_event = server[Server.event]
+        self.short_name = server.short_name
+        self.name = server.name
+        self.is_event = server.event
         self.type = get_server_type(self.name, self.is_event)
 
         self.formatted_name = self.short_name
         if self.is_event:
             self.formatted_name = util.trim_string(self.name)
 
-        self.current_players = server[Server.players]
-        self.max_players = server[Server.max_players]
+        self.current_players = server.players
+        self.max_players = server.max_players
         self.percent_players = int((self.current_players / self.max_players) * 100)
         self.players = f"{self.current_players}/{self.max_players}"
         if not self.is_online:
             self.players = players_if_offline_str
 
-        self.speed_limiter = server[Server.speed_limiter]
-        self.collisions = server[Server.collisions]
-        self.cars_for_players = server[Server.cars_for_players]
-        self.afk_enabled = server[Server.afk_enabled]
-        self.promods = server[Server.promods]
+        self.speed_limiter = server.speed_limiter
+        self.collisions = server.collisions
+        self.cars_for_players = server.cars_for_players
+        self.afk_enabled = server.afk_enabled
+        self.promods = server.promods
 
         self.speed_limiter_icon = Emoji.SL_ON if self.speed_limiter else Emoji.SL_OFF
         self.collisions_icon = Emoji.CO_ON if self.collisions else Emoji.CO_OFF

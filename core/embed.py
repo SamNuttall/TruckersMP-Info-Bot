@@ -3,7 +3,7 @@ from datetime import datetime
 
 from core import field as embed_fields
 from core import util
-from core.attribute import Server, ServerAttributes
+from core.attribute import ServerAttributes
 
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 
@@ -79,11 +79,11 @@ async def servers_stats(servers: list, filter_by_game: str = None, ingame_time: 
     max_total_players = 0
     total_in_queue = 0
     for server in servers:
-        if filter_by_game and filter_by_game != server['game']:
+        if filter_by_game and filter_by_game != server.game:
             continue
-        total_players += server['players']
-        max_total_players += server['maxplayers']
-        total_in_queue += server['queue']
+        total_players += server.players
+        max_total_players += server.max_players
+        total_in_queue += server.queue
         fields.append(await embed_fields.get_server_field(server))
 
     fields = await format_fields(fields, 0)

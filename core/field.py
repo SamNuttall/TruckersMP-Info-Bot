@@ -4,7 +4,7 @@ from core.util import INVISIBLE_CHAR
 from core.attribute import ServerAttributes, LocationAttributes
 
 
-async def get_server_field(server: dict):
+async def get_server_field(server):
     s = ServerAttributes(server)
     return EmbedField(
         name=f"{s.status_emoji}{s.game_emoji} {s.formatted_name}",
