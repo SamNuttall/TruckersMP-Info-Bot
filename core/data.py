@@ -48,7 +48,7 @@ async def get_traffic_servers():
     result['error'] = False
     endpoint = "https://api.truckyapp.com/v2/traffic/servers"
     func_resp = await get_request(endpoint)
-    if not validate_resp(func_resp, ('response', )):
+    if not validate_resp(func_resp, ('response',)):
         result['error'] = True
         return result
     resp = func_resp['resp']
@@ -79,7 +79,7 @@ async def get_traffic(traffic_servers: list):
     func_responses = await asyncio.gather(*tasks)
     traffic = []
     for index, func_resp in enumerate(func_responses):
-        if not validate_resp(func_resp, ('response', )):
+        if not validate_resp(func_resp, ('response',)):
             result['error'] = True
             return result
         resp = func_resp['resp']
@@ -129,7 +129,7 @@ async def get_ingame_time_from_api():
     result['error'] = False
     endpoint = "https://api.truckyapp.com/v2/truckersmp/time"
     func_resp = await get_request(endpoint)
-    if not validate_resp(func_resp, ('response', )):
+    if not validate_resp(func_resp, ('response',)):
         result['error'] = True
         return result
     resp = func_resp['resp']
