@@ -1,8 +1,9 @@
+from truckersmp.models import Player
 from interactions import Embed, EmbedField, EmbedFooter, EmbedImageStruct
 from datetime import datetime
 
 from core import field as embed_fields
-from core import util
+from core import util, format
 from core.attribute import ServerAttributes
 
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
@@ -13,6 +14,12 @@ async def item_not_found(item: str):
         title=f":mag: {item} not found",
         color=0xFF0000
     )
+
+
+async def item_not_found_detailed(item, desc):
+    embed = await item_not_found(item)
+    embed.description = desc
+    return embed
 
 
 async def generic_error():
@@ -200,3 +207,37 @@ async def location_stats(locations: list, filter_by: str):
             matched_locations.append(location)
 
     description = await get_description()
+
+
+async def player_stats(player: Player):
+    """Takes a specific player and creates an embed from them"""
+    p = player
+    joined = await format.to_discord(await format.to_datetime(p.join_date))
+    steam = f"[{p.steam_id_64}](https://steamcommunity.com/profiles/{p.steam_id_64})"
+    description = (
+        f"> :pencil: **Name:** {p.name}\n"
+        f"> :id: **ID:** {p.id}\n"
+        f"> :door: **Joined:** {joined}\n"
+        f"> :video_game: **Steam ID:** {steam}\n"
+        f"> :blue_circle: **Discord ID:** {p.discord_id}\n"
+    )
+    if p.vtc.name != "":
+        vtc = f"[{p.vtc.name}](https://truckersmp.com/vtc/{p.vtc.id})"
+        description += f"> :truck: **VTC:** {vtc}\n"
+    if p.banned:
+        banned = await format.to_discord(await format.to_datetime(p.banned_until), "R")
+        description += f"> :hammer: **Unbanned:** {banned}\n"
+    if p.permissions.is_game_admin:
+        description += f"> :red_circle: **Player is an in-game admin!**\n"
+        description += f"> :black_circle: **Role:** {p.group_name}\n"
+    return Embed(
+        title=f":bust_in_silhouette: TruckersMP | Player Information",
+        url=f"https://truckersmp.com/user/{p.id}",
+        description=description,
+        thumbnail=EmbedImageStruct(url=p.avatar)._json,
+        color=0x017af4,
+        timestamp=str(datetime.utcnow()),
+        footer=EmbedFooter(
+            text="Information provided by TruckersMP",
+        )
+    )

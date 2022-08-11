@@ -20,6 +20,7 @@ logger.setLevel(logging.DEBUG)
 logger.debug("Starting bot")
 load_dotenv()
 TOKEN = getenv("APP_TOKEN")
+STEAM_API_KEY = getenv("STEAM_API_KEY")
 
 bot = interactions.Client(token=TOKEN,
                           presence=interactions.ClientPresence(
@@ -67,8 +68,8 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
     scope=config.TEST_GUILD_ID,
     options=c.Options.PLAYER
 )
-async def player_cmd(ctx: interactions.CommandContext, id: int = None, player_name: str = None):
-    await h.player_cmd(ctx, id, player_name)
+async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str = None):
+    await h.player_cmd(ctx, id, name, STEAM_API_KEY)
 
 
 @bot.command(

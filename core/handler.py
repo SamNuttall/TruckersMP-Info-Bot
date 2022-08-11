@@ -54,8 +54,32 @@ async def traffic_cmd(ctx, location: str, server: str, game: str):
                    ephemeral=config.EPHEMERAL_RESPONSES)
 
 
-async def player_cmd(ctx, player_id: int, player_name: str):
-    """Pending implementation"""
+async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
+    if player_name:
+        steam_id = await data.get_steamid_via_vanityurl(steam_key, player_name)
+        if steam_id['error']:
+            await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
+            return
+        steam_id = steam_id['steam_id']
+        if steam_id is None:
+            desc = "Steam user not found with that Vanity URL"
+            await ctx.send(embeds=await embed.item_not_found_detailed("Player", desc),
+                           ephemeral=config.EPHEMERAL_RESPONSES)
+        player_id = steam_id
+    player = await truckersmp.get_player(player_id)
+    if player is False:
+        await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
+        return
+    elif player is None:
+        if player_name:
+            desc = f"A Steam [user](https://steamcommunity.com/profiles/{player_id}) was, but they are " \
+                    "not a TruckersMP player"
+            await ctx.send(embeds=await embed.item_not_found_detailed("Player", desc),
+                           ephemeral=config.EPHEMERAL_RESPONSES)
+            return
+        await ctx.send(embeds=await embed.item_not_found("Player"), ephemeral=config.EPHEMERAL_RESPONSES)
+        return
+    await ctx.send(embeds=await embed.player_stats(player), ephemeral=config.EPHEMERAL_RESPONSES)
 
 
 async def events_cmd(ctx, event_id: int):

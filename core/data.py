@@ -135,3 +135,23 @@ async def get_ingame_time_from_api():
     resp = func_resp['resp']
     result['time'] = resp['response']['calculated_game_time']
     return result
+
+
+@AsyncTTL(time_to_live=432000, maxsize=4096)
+async def get_steamid_via_vanityurl(steam_key, vanity_url: str):
+    """
+    Gets the SteamID of a user via their vanity_url
+    """
+    result = dict()
+    result['error'] = False
+    result['steam_id'] = None
+    endpoint = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001"
+    params = {'key': steam_key, 'vanityurl': vanity_url}
+    func_resp = await get_request(endpoint, params=params)
+    if not validate_resp(func_resp, ('response',)):
+        result['error'] = True
+        return result
+    resp = func_resp['resp']['response']
+    if resp['success'] == 1:
+        result['steam_id'] = resp['steamid']
+    return result
