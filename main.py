@@ -24,13 +24,8 @@ STEAM_API_KEY = getenv("STEAM_API_KEY")
 
 bot = interactions.Client(token=TOKEN,
                           presence=interactions.ClientPresence(
-                              activities=(interactions.PresenceActivity(
-                                  name="TruckersMP Stats",
-                                  type=interactions.PresenceActivityType.WATCHING
-                              ),),
-                              status=interactions.StatusType.ONLINE
-                          )
-                          )
+                              activities=[interactions.PresenceActivity(
+                                  name="TruckersMP Stats", type=interactions.PresenceActivityType.WATCHING)]))
 
 if not startup.checks(TOKEN):
     print("Failed startup checks; Check log file for info")
