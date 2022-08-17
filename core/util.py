@@ -1,8 +1,4 @@
-from hashlib import sha1
-from json import dumps
-
-from truckersmp.cache import Cache
-from typing import Callable
+import core.assemble
 
 INVISIBLE_CHAR = "ㅤ"
 
@@ -22,3 +18,11 @@ def strip_dict_key_value(dictionaries: list, key: str):
     for dictionary in dictionaries:
         values.append(dictionary[key])
     return values
+
+
+def get_cache_info():
+    info = str()
+    assemble_caches = core.assemble.get_caches()
+    for c in assemble_caches:
+        info += f"{c.get_info()}\n"
+    return info

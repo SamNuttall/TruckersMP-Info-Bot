@@ -1,6 +1,6 @@
 import asyncio
 from interactions import CommandContext
-from core import assemble, data, embed, format
+from core import assemble, data, embed, format, util
 from datetime import datetime
 from interactions.base import get_logger
 import config
@@ -84,6 +84,11 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
 
 async def events_cmd(ctx, event_id: int):
     """Pending implementation"""
+
+
+async def cache_cmd(ctx):
+    info = util.get_cache_info()
+    await ctx.send(f":file_folder: **Caches** | Chars: {len(info)}```{util.get_cache_info()}```", ephemeral=True)
 
 
 async def autocomplete_server(ctx, user_input: str):

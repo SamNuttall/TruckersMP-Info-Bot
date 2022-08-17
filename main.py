@@ -77,6 +77,15 @@ async def events_cmd(ctx: interactions.CommandContext, id: int = None):
     await h.events_cmd(ctx, id)
 
 
+@bot.command(
+    name=c.Name.CACHE,
+    description=c.Description.CACHE,
+    scope=config.TEST_GUILD_ID
+)
+async def cache_cmd(ctx: interactions.CommandContext):
+    await h.cache_cmd(ctx)
+
+
 @bot.autocomplete(command=c.Name.SERVERS, name=c.OptionName.SERVER)
 async def autocomplete_server(ctx, user_input: str = ""):
     await h.autocomplete_server(ctx, user_input)

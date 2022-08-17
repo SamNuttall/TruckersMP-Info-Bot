@@ -23,6 +23,7 @@ class Name:
     TRAFFIC = "traffic"
     PLAYER = "player"
     EVENTS = "events"
+    CACHE = "cache"
 
 
 class Description:
@@ -30,6 +31,7 @@ class Description:
     TRAFFIC = "Get information about traffic in-game"
     PLAYER = "Get information about a TruckersMP player"
     EVENTS = "Get information about upcoming events on TruckersMP"
+    CACHE = "Get information about the caches (admin)"
 
 
 class OptionName:
