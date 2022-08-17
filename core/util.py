@@ -1,4 +1,4 @@
-import core.assemble
+from truckersmp.cache import get_caches
 
 INVISIBLE_CHAR = "ㅤ"
 
@@ -22,7 +22,7 @@ def strip_dict_key_value(dictionaries: list, key: str):
 
 def get_cache_info():
     info = str()
-    assemble_caches = core.assemble.get_caches()
-    for c in assemble_caches:
+    caches = get_caches()
+    for c in caches:
         info += f"{c.get_info()}\n"
     return info
