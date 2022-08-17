@@ -1,9 +1,14 @@
 from interactions import Choice
 from difflib import SequenceMatcher
-from cache import AsyncLRU
+from core.util import strip_dict_key_value
+from truckersmp.cache import Cache
+
+sim_score_cache = Cache(max_size=5_000_000)
+server_choice_cache = Cache(max_size=2000)
+location_choice_cache = Cache(max_size=10000)
 
 
-async def add_sim_score(list_of_dict: list, search: str, key: str):
+def add_sim_score(list_of_dict: list, search: str, key: str):
     """
     Adds a similarity score key + value to dictionaries in a list based on a search string
     The search string is matched against the inputted key value per dictionary.
@@ -20,18 +25,22 @@ async def add_sim_score(list_of_dict: list, search: str, key: str):
             - contains: 1 if the search string is contained within the value
             * similarity marked by float between 0 & 1 (1 being most similar)
     """
+
+    def get_score(a, b):
+        return sim_score_cache.execute(SequenceMatcher, None, a, b).ratio()
+
     for dictionary in list_of_dict:
-        dictionary['sim_score'] = SequenceMatcher(None, dictionary[key], search).ratio()
-        dictionary['first_sim_score'] = SequenceMatcher(None, dictionary[key].split()[0], search).ratio()
-        dictionary['trim_sim_score'] = SequenceMatcher(None, dictionary[key].split('(')[0], search).ratio()
+        dictionary['sim_score'] = get_score(dictionary[key], search)
+        dictionary['first_sim_score'] = get_score(dictionary[key].split()[0], search)
+        dictionary['trim_sim_score'] = get_score(dictionary[key].split('(')[0], search)
         dictionary['contains'] = 1 if search.lower() in dictionary[key].lower() else 0
+
     return sorted(
         list_of_dict, key=lambda x: (x['contains'], x['sim_score'], x['trim_sim_score'], x['first_sim_score']),
         reverse=True
     )
 
 
-@AsyncLRU(maxsize=1024)
 async def get_server_choices(servers: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.4):
     """
     Get a list of TruckersMP (traffic) servers to use as choices
@@ -44,28 +53,34 @@ async def get_server_choices(servers: list, search: str = "", maximum: int = 25,
     Returns:
         list: interactions.Choice
     """
-    choice_list = []
-    if search != "":
-        servers = await add_sim_score(servers, search, 'name')
-    for server in servers:
-        valid_score = True
+
+    def logic():
+        choice_list = []
+        s = servers
         if search != "":
-            valid_score = max(server['sim_score'],
-                              server['trim_sim_score'],
-                              server['first_sim_score']) >= min_sim_score or server['contains'] == 1
-        if len(choice_list) >= maximum or not valid_score:
-            break
-        identifier = 'id'
-        if 'id' not in server:
-            identifier = 'url'
-        choice_list.append(Choice(
-            name=f"{server['name']} ({server['game'].upper()})",
-            value=server[identifier]
-        ))
-    return choice_list
+            s = add_sim_score(s, search, 'name')
+        for server in s:
+            valid_score = True
+            if search != "":
+                valid_score = max(server['sim_score'],
+                                  server['trim_sim_score'],
+                                  server['first_sim_score']) >= min_sim_score or server['contains'] == 1
+            if len(choice_list) >= maximum or not valid_score:
+                break
+            identifier = 'id'
+            if 'id' not in server:
+                identifier = 'url'
+            choice_list.append(Choice(
+                name=f"{server['name']} ({server['game'].upper()})",
+                value=server[identifier]
+            ))
+        return choice_list
+
+    server_names = strip_dict_key_value(servers, "name")
+    key = (tuple(server_names), search, maximum, min_sim_score)
+    return server_choice_cache.execute(logic, key)
 
 
-@AsyncLRU(maxsize=1024)
 async def get_location_choices(locations: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.55):
     """
     Get a list of in-game locations to use as choices
@@ -78,29 +93,36 @@ async def get_location_choices(locations: list, search: str = "", maximum: int =
     Returns:
         list: interactions.Choice
     """
-    choice_list = []
-    added_locations = []
-    if search != "":
-        locations = await add_sim_score(locations, search, 'name')
-    for location in locations:
-        valid_score = True
+
+    def logic():
+        choice_list = []
+        added_locations = []
+        locs = locations
         if search != "":
-            valid_score = max(location['sim_score'],
-                              location['trim_sim_score'],
-                              location['first_sim_score']) >= min_sim_score or (
-                                  location['contains'] == 1 or location['country'].lower() in search.lower()
-                          )
-        if not valid_score:
-            continue
-        if len(choice_list) >= maximum:
-            break
-        if location['name'] not in added_locations:
-            choice_list.append(Choice(
-                name=f"{location['name']} ({location['country']}) ({location['game']})",
-                value=location['name']
-            ))
-            added_locations.append(location['name'])
-    return choice_list
+            locs = add_sim_score(locs, search, 'name')
+        for location in locs:
+            valid_score = True
+            if search != "":
+                valid_score = max(location['sim_score'],
+                                  location['trim_sim_score'],
+                                  location['first_sim_score']) >= min_sim_score or (
+                                      location['contains'] == 1 or location['country'].lower() in search.lower()
+                              )
+            if not valid_score:
+                continue
+            if len(choice_list) >= maximum:
+                break
+            if location['name'] not in added_locations:
+                choice_list.append(Choice(
+                    name=f"{location['name']} ({location['country']}) ({location['game']})",
+                    value=location['name']
+                ))
+                added_locations.append(location['name'])
+        return choice_list
+
+    location_names = strip_dict_key_value(locations, "name")
+    key = (tuple(location_names), search, maximum, min_sim_score)
+    return location_choice_cache.execute(logic, key)
 
 
 def get_game_choices():
