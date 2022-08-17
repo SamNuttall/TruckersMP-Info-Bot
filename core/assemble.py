@@ -8,10 +8,6 @@ server_choice_cache = Cache(name="server_choice", max_size=2000)
 location_choice_cache = Cache(name="location_choice", max_size=10000)
 
 
-def get_caches():
-    return sim_score_cache, server_choice_cache, location_choice_cache
-
-
 def add_sim_score(list_of_dict: list, search: str, key: str):
     """
     Adds a similarity score key + value to dictionaries in a list based on a search string
