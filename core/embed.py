@@ -58,16 +58,15 @@ async def get_description(filter_by_server: str = None, filter_by_game: str = No
                           total_in_queue: int = None, ingame_time: str = None,
                           players_in_locations: int = None, players_in_traffic: int = None):
     """Get the description for an embed based on the filters"""
-    description_start = f":pencil: **Filtered by "
+    description_start = f"\n:pencil: **Filtered by "
     description = ""
     if filter_by_server:
-        description += description_start + f"server:** {filter_by_server}\n"
+        description += description_start + f"server:** {filter_by_server}"
     if filter_by_game:
-        description += description_start + f"game:** {filter_by_game}\n"
+        description += description_start + f"game:** {filter_by_game}"
     if filter_by_location:
         description += description_start + f"location:** {filter_by_location}"
-    else:
-        description = ""
+
     if total_players is not None and max_total_players is not None and total_in_queue is not None:
         description += (f"\n**:busts_in_silhouette: Total Players:** " +
                         f"{total_players}/{max_total_players} ({total_in_queue} in queue)")
