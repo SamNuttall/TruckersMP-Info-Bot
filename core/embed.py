@@ -1,4 +1,4 @@
-from truckersmp.models import Player
+from truckersmp.models import Player, Event
 from interactions import Embed, EmbedField, EmbedFooter, EmbedImageStruct
 from datetime import datetime
 
@@ -236,6 +236,51 @@ async def player_stats(player: Player):
         url=f"https://truckersmp.com/user/{p.id}",
         description=description,
         thumbnail=EmbedImageStruct(url=p.avatar)._json,
+        color=0x017af4,
+        timestamp=str(datetime.utcnow()),
+        footer=EmbedFooter(
+            text="Information provided by TruckersMP",
+        )
+    )
+
+
+async def events_stats(events: list):
+    fields = []
+    for event in events:
+        fields.append(await embed_fields.get_event_field(event))
+    fields = await format_fields(fields, 0)
+
+    return Embed(
+        title=f":truck: TruckersMP | Events",
+        url="https://truckersmp.com/events",
+        thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
+        color=0x017af4,
+        timestamp=str(datetime.utcnow()),
+        fields=fields,
+        footer=EmbedFooter(
+            text="Information provided by TruckersMP",
+        )
+    )
+
+
+async def event_stats(event: Event):
+    """Takes a specific event and creates an embed from them"""
+    e = event
+    start_time = await format.to_discord(await format.to_datetime(e.start_at))
+    description = (
+        f"**{e.name}**\n"
+        f"*{e.game} - {e.server.name}*\n"
+        f"{start_time}\n\n"
+        f"> :id: **ID:** {e.id}\n"
+        f"> :speech_left: **Language:** {e.language}\n"
+
+    )
+
+    return Embed(
+        title=f":bust_in_silhouette: TruckersMP | Event Information",
+        url=f"https://truckersmp.com/events/{e.id}",
+        image=EmbedImageStruct(url=e.banner),
+        description=description,
         color=0x017af4,
         timestamp=str(datetime.utcnow()),
         footer=EmbedFooter(

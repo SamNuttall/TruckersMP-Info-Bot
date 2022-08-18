@@ -1,6 +1,6 @@
 from interactions import EmbedField
-
-from core.util import INVISIBLE_CHAR
+from core import format
+from core.util import INVISIBLE_CHAR, trim_string
 from core.attribute import ServerAttributes, LocationAttributes
 
 
@@ -19,4 +19,13 @@ async def get_location_field(location: dict):
         name=lo.trimmed_name,
         value=f"{lo.game_emoji} **{lo.server_name}\nPlayers:** {lo.players} {INVISIBLE_CHAR}\n{lo.severity_bar}",
         inline=True,
+    )
+
+
+async def get_event_field(event):
+    start_time = await format.to_discord(await format.to_datetime(event.start_at))
+    url = f"https://truckersmp.com/events/{event.id}"
+    return EmbedField(
+        name=event.name,
+        value=f"***{event.game}** - {event.server.name}*\n{start_time}\nID: {event.id} | [View details]({url})"
     )
