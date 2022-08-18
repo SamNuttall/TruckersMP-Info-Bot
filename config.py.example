@@ -5,7 +5,12 @@
 GUILD_ID = None
 
 # Provide a guild ID for debug/admin commands (eg. /cache).
-ADMIN_GUILD_ID = 0 # Change this!
+ADMIN_GUILD_ID = 0  # Change this!
 
 # Whether responses to slash commands should be only be shown to the command author/instigator.
 EPHEMERAL_RESPONSES = False
+
+BOT_AVATAR_URL = "https://example.com"  # Change this!
+BOT_INVITE_URL = "https://example.com"
+PRIVACY_POLICY_URL = "https://example.com"
+SOURCE_CODE_URL = "https://example.com"

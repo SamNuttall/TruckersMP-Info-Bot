@@ -1,5 +1,5 @@
 import interactions
-from interactions import autodefer
+from interactions import autodefer, MISSING
 from core import handler as h
 from core import command as c
 from core import startup
@@ -23,15 +23,19 @@ load_dotenv()
 TOKEN = getenv("APP_TOKEN")
 STEAM_API_KEY = getenv("STEAM_API_KEY")
 
+if not startup.checks(TOKEN, STEAM_API_KEY, config.GUILD_ID, config.ADMIN_GUILD_ID, config.EPHEMERAL_RESPONSES):
+    print("Failed startup checks; Check log file (log.log) for info")
+    quit(1)
+
+config.GUILD_ID = config.GUILD_ID if config.GUILD_ID else MISSING
+
 bot = interactions.Client(token=TOKEN,
                           intents=interactions.Intents.GUILD_INTEGRATIONS,
                           presence=interactions.ClientPresence(
                               activities=[interactions.PresenceActivity(
-                                  name="TruckersMP Stats", type=interactions.PresenceActivityType.WATCHING)]))
-
-if not startup.checks(TOKEN, STEAM_API_KEY, config.GUILD_ID, config.ADMIN_GUILD_ID, config.EPHEMERAL_RESPONSES):
-    print("Failed startup checks; Check log file (log.log) for info")
-    quit(1)
+                                  name="TruckersMP Stats", type=interactions.PresenceActivityType.WATCHING)
+                              ]
+                          ))
 
 
 @bot.event
@@ -43,7 +47,8 @@ async def on_ready():
     name=c.Name.SERVERS,
     description=c.Description.SERVERS,
     scope=config.GUILD_ID,
-    options=c.Options.SERVERS
+    options=c.Options.SERVERS,
+    dm_permission=True
 )
 @autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game: str = None):
@@ -54,7 +59,8 @@ async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game
     name=c.Name.TRAFFIC,
     description=c.Description.TRAFFIC,
     scope=config.GUILD_ID,
-    options=c.Options.TRAFFIC
+    options=c.Options.TRAFFIC,
+    dm_permission=True
 )
 @autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
@@ -65,7 +71,8 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
     name=c.Name.PLAYER,
     description=c.Description.PLAYER,
     scope=config.GUILD_ID,
-    options=c.Options.PLAYER
+    options=c.Options.PLAYER,
+    dm_permission=True
 )
 @autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str = None):
@@ -76,11 +83,33 @@ async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str
     name=c.Name.EVENTS,
     description=c.Description.EVENTS,
     scope=config.GUILD_ID,
-    options=c.Options.EVENTS
+    options=c.Options.EVENTS,
+    dm_permission=True
 )
 @autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def events_cmd(ctx: interactions.CommandContext, id: int = None):
     await h.events_cmd(ctx, id)
+
+
+@bot.command(
+    name=c.Name.INFO,
+    description=c.Description.INFO,
+    scope=409281778210308107,
+    dm_permission=True
+)
+@autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
+async def info_cmd(ctx: interactions.CommandContext):
+    await h.info_cmd(ctx, config)
+
+
+@bot.command(
+    name=c.Name.DEV_INFO,
+    description=c.Description.DEV_INFO,
+    scope=config.ADMIN_GUILD_ID
+)
+@autodefer(ephemeral=True)
+async def devinfo_cmd(ctx: interactions.CommandContext):
+    await h.devinfo_cmd(ctx, bot, config.OWNER_ID)
 
 
 @bot.command(
@@ -90,7 +119,7 @@ async def events_cmd(ctx: interactions.CommandContext, id: int = None):
 )
 @autodefer(ephemeral=True)
 async def cache_cmd(ctx: interactions.CommandContext):
-    await h.cache_cmd(ctx)
+    await h.cache_cmd(ctx, config.OWNER_ID)
 
 
 @bot.autocomplete(command=c.Name.SERVERS, name=c.OptionName.SERVER)

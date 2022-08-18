@@ -24,6 +24,8 @@ class Name:
     PLAYER = "player"
     EVENTS = "events"
     CACHE = "cache"
+    INFO = "info"
+    DEV_INFO = "devinfo"
 
 
 class Description:
@@ -32,6 +34,8 @@ class Description:
     PLAYER = "Get information about a TruckersMP player"
     EVENTS = "Get information about upcoming events on TruckersMP"
     CACHE = "Get information about the caches (admin)"
+    INFO = "Get information about the bot"
+    DEV_INFO = "Get information about the bot backend (admin)"
 
 
 class OptionName:

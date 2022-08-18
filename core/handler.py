@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from interactions import CommandContext
 from core import assemble, data, embed, format, util
 from datetime import datetime
@@ -112,7 +113,28 @@ async def events_cmd(ctx, event_id: int):
         await ctx.send(embeds=await embed.events_stats(events.featured), ephemeral=config.EPHEMERAL_RESPONSES)
 
 
-async def cache_cmd(ctx):
+async def info_cmd(ctx, conf):
+    await ctx.send(embeds=await embed.bot_info(conf.BOT_AVATAR_URL, conf.BOT_INVITE_URL,
+                                               conf.PRIVACY_POLICY_URL, conf.SOURCE_CODE_URL),
+                   ephemeral=config.EPHEMERAL_RESPONSES)
+
+
+async def devinfo_cmd(ctx, bot, owner_id):
+    if ctx.author.user.id != owner_id:
+        await ctx.send("You do not have permission to use this command.", ephemeral=True)
+        return
+    content = ("```"
+               f"Num of Guilds: {len(bot.guilds)}\n"
+               f"Py Version: {sys.version}"
+               "```"
+               )
+    await ctx.send(content, ephemeral=True)
+
+
+async def cache_cmd(ctx, owner_id):
+    if ctx.author.user.id != owner_id:
+        await ctx.send("You do not have permission to use this command.", ephemeral=True)
+        return
     info = util.get_cache_info()
     await ctx.send(f":file_folder: **Caches** | Chars: {len(info)}```{util.get_cache_info()}```", ephemeral=True)
 

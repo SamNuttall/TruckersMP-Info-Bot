@@ -286,3 +286,32 @@ async def event_stats(event: Event):
             text="Information provided by TruckersMP",
         )
     )
+
+
+async def bot_info(avatar_url, invite_link, privacy_policy, source_code):
+    fields = [
+        EmbedField(
+            name="About",
+            value=f"Hi, I'm Alfie! :wave:\nA small companion for TruckersMP stats.\nThanks for using me :)"
+        ),
+        EmbedField(
+            name="Commands",
+            value=f"I fully support slash commands!\nType **/** in chat for more"
+        ),
+        EmbedField(
+            name="Useful Links",
+            value=f":robot: [Invite]({invite_link}) | "
+                  f":shield: [Privacy Policy]({privacy_policy}) | "
+                  f":mag: [Source Code]({source_code})"
+        )
+    ]
+    return Embed(
+        title=":page_facing_up: Bot Information",
+        fields=fields,
+        color=0x017af4,
+        timestamp=str(datetime.utcnow()),
+        footer=EmbedFooter(
+            text="Developed with love by Sam#9210",
+            icon_url=avatar_url
+        )
+    )
