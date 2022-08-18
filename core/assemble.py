@@ -55,13 +55,22 @@ async def get_server_choices(servers: list, search: str = "", maximum: int = 25,
     Get a list of TruckersMP (traffic) servers to use as choices
 
     Args:
-        servers: list = List of dicts containing each server's info
+        servers: list = List of dicts or Server (will be converted to dict) containing each server's info
         search: str = Term to order list by
         maximum: int = maximum number of choices returned
         min_sim_score: float = remove servers with a lower sim score (smallest similarity to search)
     Returns:
         list: interactions.Choice
     """
+
+    def to_dicts():
+        if type(servers[0]) == dict:  # Assumption: If first item is a dict, all are
+            return servers
+
+        servers_as_dicts = list()
+        for serv in servers:
+            servers_as_dicts.append({'name': serv.name, 'game': serv.game, 'id': serv.id})
+        return servers_as_dicts  # We only need these key-values here ^
 
     def logic():
         choice_list = []
@@ -85,6 +94,7 @@ async def get_server_choices(servers: list, search: str = "", maximum: int = 25,
             ))
         return choice_list
 
+    servers = to_dicts()
     server_names = strip_dict_key_value(servers, "name")
     key = (tuple(server_names), search, maximum, min_sim_score)
     return server_choice_cache.execute(logic, key)

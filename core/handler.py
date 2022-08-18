@@ -93,10 +93,10 @@ async def cache_cmd(ctx):
 
 async def autocomplete_server(ctx, user_input: str):
     logger.debug(f"Handle Autocomplete Request: servers, guild {ctx.guild_id}, user {ctx.author.user.id}")
-    servers = await data.get_servers()
-    if not servers['error']:
+    servers = await truckersmp.get_servers()
+    if servers is not None:
         await ctx.populate(
-            await assemble.get_server_choices(servers['servers'], user_input)
+            await assemble.get_server_choices(servers, user_input)
         )
 
 
