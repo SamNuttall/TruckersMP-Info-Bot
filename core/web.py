@@ -5,7 +5,7 @@ from interactions.base import get_logger
 logger = get_logger("general")
 
 
-async def get_request(url: str, headers: dict = None, params: dict = None, timeout: int = 10):
+async def get_request(url: str, headers: dict = None, params: dict = None, timeout: int = 10, limiter = None):
     """
     Makes a web get request (eg. to an API) for JSON.
 
@@ -14,6 +14,7 @@ async def get_request(url: str, headers: dict = None, params: dict = None, timeo
         headers: dict = HTTP headers to send with the request
         params: dict = Parameters to pass with request
         timeout: int = How long to wait for a response before cancelling
+        limiter: aiolimiter.AsyncLimiter = A rate limiter to follow
     Returns:
         dict =
             error: bool = True if status not 200 or not other error
@@ -27,6 +28,9 @@ async def get_request(url: str, headers: dict = None, params: dict = None, timeo
         headers = {'User-Agent': user_agent}  # Some APIs want a user-agent, otherwise will return 403
     else:
         headers['User-Agent'] = user_agent
+
+    if limiter:
+        await limiter.acquire()
 
     try:
         async with aiohttp.ClientSession() as session:

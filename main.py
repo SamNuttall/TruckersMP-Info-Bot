@@ -24,6 +24,7 @@ TOKEN = getenv("APP_TOKEN")
 STEAM_API_KEY = getenv("STEAM_API_KEY")
 
 bot = interactions.Client(token=TOKEN,
+                          intents=interactions.Intents.GUILD_INTEGRATIONS,
                           presence=interactions.ClientPresence(
                               activities=[interactions.PresenceActivity(
                                   name="TruckersMP Stats", type=interactions.PresenceActivityType.WATCHING)]))

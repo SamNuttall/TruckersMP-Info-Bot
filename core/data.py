@@ -1,13 +1,14 @@
 import asyncio
-import logging
 
 from core.web import get_request, validate_resp
 from datetime import datetime, timezone, timedelta
 from interactions.base import get_logger
 from truckersmp.cache import Cache
-from core.util import strip_dict_key_value
+from aiolimiter import AsyncLimiter
 
 logger = get_logger("general")
+trucky_api_limiter = AsyncLimiter(15, 20)  # 15 requests / 20 secs
+steam_api_limiter = AsyncLimiter(20, 20)  # 20 requests / 20 secs (Steam API rate limit: 100K / day)
 
 traffic_servers_cache = Cache(name="traffic_servers", max_size=1, time_to_live=90)
 traffic_cache = Cache(name="traffic", max_size=1, time_to_live=90)
@@ -30,7 +31,7 @@ async def get_traffic_servers():
         result = dict()
         result['error'] = False
         endpoint = "https://api.truckyapp.com/v2/traffic/servers"
-        func_resp = await get_request(endpoint)
+        func_resp = await get_request(endpoint, limiter=trucky_api_limiter)
         if not validate_resp(func_resp, ('response',)):
             result['error'] = True
             return result
@@ -60,7 +61,10 @@ async def get_traffic(traffic_servers: list):
         game_order = []
         for server in traffic_servers:
             game_order.append(server['game'].upper())
-            tasks.append(get_request(endpoint, params={'game': server['game'], 'server': server['url']}))
+            tasks.append(get_request(endpoint,
+                                     params={'game': server['game'], 'server': server['url']},
+                                     limiter=trucky_api_limiter
+                                     ))
         func_responses = await asyncio.gather(*tasks)
         traffic = []
         for index, func_resp in enumerate(func_responses):
@@ -94,7 +98,8 @@ async def get_ingame_time():
         time_now = datetime.now(timezone.utc)
 
         since_epoch = time_now - epoch
-        ingame_mins_since_epoch = timedelta(seconds=since_epoch.total_seconds() * 6)  # 10 real sec = 60 in-game sec (x*6)
+        ingame_mins_since_epoch = timedelta(
+            seconds=since_epoch.total_seconds() * 6)  # 10 real sec = 60 in-game sec (x*6)
         game_time = epoch + ingame_mins_since_epoch + offset
 
         return game_time
@@ -116,7 +121,7 @@ async def get_ingame_time_from_api():
         result = dict()
         result['error'] = False
         endpoint = "https://api.truckyapp.com/v2/truckersmp/time"
-        func_resp = await get_request(endpoint)
+        func_resp = await get_request(endpoint, limiter=trucky_api_limiter)
         if not validate_resp(func_resp, ('response',)):
             result['error'] = True
             return result
@@ -137,7 +142,7 @@ async def get_steamid_via_vanityurl(steam_key, vanity_url: str):
         result['steam_id'] = None
         endpoint = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001"
         params = {'key': steam_key, 'vanityurl': vanity_url}
-        func_resp = await get_request(endpoint, params=params)
+        func_resp = await get_request(endpoint, params=params, limiter=steam_api_limiter)
         if not validate_resp(func_resp, ('response',)):
             result['error'] = True
             return result
