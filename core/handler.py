@@ -12,6 +12,10 @@ truckersmp = TruckersMP(logger=logger)
 
 async def servers_cmd(ctx: CommandContext, server: int, game: str):
     logger.debug(f"Handle Command Request: servers, guild {ctx.guild_id}, user {ctx.author.user.id}")
+
+    if server and game:
+        game = None
+
     server_id = server
     servers, ingame_time = await asyncio.gather(
         truckersmp.get_servers(), data.get_ingame_time()
@@ -40,6 +44,10 @@ async def servers_cmd(ctx: CommandContext, server: int, game: str):
 
 async def traffic_cmd(ctx, location: str, server: str, game: str):
     logger.debug(f"Handle Command Request: traffic, guild {ctx.guild_id}, user {ctx.author.user.id}")
+
+    if server and game:
+        game = None
+
     traffic_servers = await data.get_traffic_servers()
     if traffic_servers['error']:
         logger.error("Returned something went wrong message to user: get traffic servers failed")
@@ -73,7 +81,7 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
     elif player is None:
         if player_name:
             desc = f"A Steam [user](https://steamcommunity.com/profiles/{player_id}) was, but they are " \
-                    "not a TruckersMP player"
+                   "not a TruckersMP player"
             await ctx.send(embeds=await embed.item_not_found_detailed("Player", desc),
                            ephemeral=config.EPHEMERAL_RESPONSES)
             return
@@ -83,7 +91,25 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
 
 
 async def events_cmd(ctx, event_id: int):
-    """Pending implementation"""
+    if event_id:
+        event = await truckersmp.get_event(event_id)
+        if event is False:
+            await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
+            return
+        elif event is None:
+            await ctx.send(embeds=await embed.item_not_found("Event"), ephemeral=config.EPHEMERAL_RESPONSES)
+            return
+        await ctx.send(embeds=await embed.event_stats(event), ephemeral=config.EPHEMERAL_RESPONSES)
+        return
+    else:
+        events = await truckersmp.get_events()
+        if events is False:
+            await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
+            return
+        elif events is None:
+            await ctx.send(embeds=await embed.item_not_found("Events"), ephemeral=config.EPHEMERAL_RESPONSES)
+            return
+        await ctx.send(embeds=await embed.events_stats(events.featured), ephemeral=config.EPHEMERAL_RESPONSES)
 
 
 async def cache_cmd(ctx):
