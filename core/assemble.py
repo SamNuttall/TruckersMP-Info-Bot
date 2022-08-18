@@ -2,8 +2,15 @@ from interactions import Choice
 from difflib import SequenceMatcher
 from core.util import strip_dict_key_value
 from truckersmp.cache import Cache
+from time import perf_counter
 
-sim_score_cache = Cache(name="sim_score", max_size=5_000_000)
+# TODO: Look into reducing memory footprint of sim_score cache and it's viability.
+# Once values are cached, the time to add sim scores is reduced (~60% decrease).
+# Memory footprint of current implementation is very large though. Approx at sizes:
+# 52MB per 100k (520MB at 1M, 2.6GB at 5M - Original Maximum)
+
+
+sim_score_cache = Cache(name="sim_score", max_size=200_000)
 server_choice_cache = Cache(name="server_choice", max_size=2000)
 location_choice_cache = Cache(name="location_choice", max_size=10000)
 
@@ -25,9 +32,11 @@ def add_sim_score(list_of_dict: list, search: str, key: str):
             - contains: 1 if the search string is contained within the value
             * similarity marked by float between 0 & 1 (1 being most similar)
     """
+    def get_ratio(a, b):
+        return SequenceMatcher(a, b).ratio()
 
     def get_score(a, b):
-        return sim_score_cache.execute(SequenceMatcher, None, a, b).ratio()
+        return sim_score_cache.execute(get_ratio, None, a, b)
 
     for dictionary in list_of_dict:
         dictionary['sim_score'] = get_score(dictionary[key], search)
