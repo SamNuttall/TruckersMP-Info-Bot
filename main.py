@@ -94,7 +94,7 @@ async def events_cmd(ctx: interactions.CommandContext, id: int = None):
 @bot.command(
     name=c.Name.INFO,
     description=c.Description.INFO,
-    scope=409281778210308107,
+    scope=config.GUILD_ID,
     dm_permission=True
 )
 @autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
