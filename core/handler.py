@@ -11,8 +11,15 @@ logger = get_logger("general")
 truckersmp = TruckersMP(logger=logger)
 
 
+def log(ctx, name, is_cmd: bool = True):
+    req_type = "Command" if is_cmd else "Autocomplete"
+    guild = ctx.guild_id if ctx.guild_id else "N/A (Direct Msg)"
+    author = ctx.author.user.id if ctx.author else "Unknown"
+    logger.debug(f"Handle {req_type} Request: {name} | guild: {guild} & user: {author}")
+
+
 async def servers_cmd(ctx: CommandContext, server: int, game: str):
-    logger.debug(f"Handle Command Request: servers, guild {ctx.guild_id}, user {ctx.author.user.id}")
+    log(ctx, "servers")
 
     if server and game:
         game = None
@@ -44,7 +51,7 @@ async def servers_cmd(ctx: CommandContext, server: int, game: str):
 
 
 async def traffic_cmd(ctx, location: str, server: str, game: str):
-    logger.debug(f"Handle Command Request: traffic, guild {ctx.guild_id}, user {ctx.author.user.id}")
+    log(ctx, "traffic")
 
     if server and game:
         game = None
@@ -64,6 +71,8 @@ async def traffic_cmd(ctx, location: str, server: str, game: str):
 
 
 async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
+    log(ctx, "player")
+
     if player_name:
         steam_id = await data.get_steamid_via_vanityurl(steam_key, player_name)
         if steam_id['error']:
@@ -92,6 +101,8 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
 
 
 async def events_cmd(ctx, event_id: int):
+    log(ctx, "events")
+
     if event_id:
         event = await truckersmp.get_event(event_id)
         if event is False:
@@ -114,12 +125,14 @@ async def events_cmd(ctx, event_id: int):
 
 
 async def info_cmd(ctx, conf):
+    log(ctx, "info")
     await ctx.send(embeds=await embed.bot_info(conf.BOT_AVATAR_URL, conf.BOT_INVITE_URL,
                                                conf.PRIVACY_POLICY_URL, conf.SOURCE_CODE_URL),
                    ephemeral=config.EPHEMERAL_RESPONSES)
 
 
 async def devinfo_cmd(ctx, bot, owner_id):
+    log(ctx, "devinfo")
     if ctx.author.user.id != owner_id:
         await ctx.send("You do not have permission to use this command.", ephemeral=True)
         return
@@ -132,6 +145,7 @@ async def devinfo_cmd(ctx, bot, owner_id):
 
 
 async def cache_cmd(ctx, owner_id):
+    log(ctx, "cache")
     if ctx.author.user.id != owner_id:
         await ctx.send("You do not have permission to use this command.", ephemeral=True)
         return
@@ -140,7 +154,7 @@ async def cache_cmd(ctx, owner_id):
 
 
 async def autocomplete_server(ctx, user_input: str):
-    logger.debug(f"Handle Autocomplete Request: servers, guild {ctx.guild_id}, user {ctx.author.user.id}")
+    log(ctx, "server", is_cmd=False)
     servers = await truckersmp.get_servers()
     if servers is not None:
         await ctx.populate(
@@ -149,7 +163,7 @@ async def autocomplete_server(ctx, user_input: str):
 
 
 async def autocomplete_traffic(ctx, user_input: str):
-    logger.debug(f"Handle Autocomplete Request: traffic, guild {ctx.guild_id}, user {ctx.author.user.id}")
+    log(ctx, "traffic", is_cmd=False)
     traffic_servers = await data.get_traffic_servers()
     if traffic_servers['error']:
         return  # error
@@ -163,7 +177,7 @@ async def autocomplete_traffic(ctx, user_input: str):
 
 
 async def autocomplete_traffic_servers(ctx, user_input: str):
-    logger.debug(f"Handle Autocomplete Request: traffic_servers, guild {ctx.guild_id}, user {ctx.author.user.id}")
+    log(ctx, "traffic_servers", is_cmd=False)
     servers = await data.get_traffic_servers()
     if not servers['error']:
         await ctx.populate(
