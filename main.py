@@ -102,9 +102,4 @@ async def autocomplete_traffic_servers(ctx, user_input: str = ""):
 
 
 if __name__ == "__main__":
-    try:
-        bot.start()
-    except KeyboardInterrupt:
-        # logger.info("Cleaning up before exit")
-        logger.info("Bot shutdown")
-        quit()
+    bot.start()
