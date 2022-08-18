@@ -2,7 +2,6 @@ import asyncio
 import logging
 
 from core.web import get_request, validate_resp
-from cache import AsyncTTL, AsyncLRU
 from datetime import datetime, timezone, timedelta
 from interactions.base import get_logger
 from truckersmp.cache import Cache
@@ -15,33 +14,6 @@ traffic_cache = Cache(name="traffic", max_size=1, time_to_live=90)
 time_cache = Cache(name="time", max_size=1, time_to_live=5)
 api_time_cache = Cache(name="api_time", max_size=1, time_to_live=120)
 steam_vanityurl_cache = Cache(name="steam_vanityurl", max_size=3000, time_to_live=timedelta(days=5))
-
-
-@AsyncTTL(time_to_live=60, maxsize=1)
-async def get_servers():
-    """
-    Gets a list of all TruckersMP servers
-
-    Returns:
-        dict =
-            error: bool = True if status not 200 or other error
-            servers?: list = Contains dicts with server info (https://stats.truckersmp.com/api#servers_list)
-    """
-    logger.warning("get_servers should no longer be used. Use async-truckersmp library instead")
-    # TODO: Stop using function, then remove it
-    result = dict()
-    result['error'] = False
-    endpoint = "https://api.truckersmp.com/v2/servers"
-    func_resp = await get_request(endpoint)
-    if not validate_resp(func_resp, ('error', 'response')):
-        result['error'] = True
-        return result
-    resp = func_resp['resp']
-    if resp['error'] == "true":
-        result['error'] = True
-        return result
-    result['servers'] = resp['response']
-    return result
 
 
 async def get_traffic_servers():
