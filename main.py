@@ -1,4 +1,5 @@
 import interactions
+from interactions import autodefer
 from core import handler as h
 from core import command as c
 from core import startup
@@ -43,6 +44,7 @@ async def on_ready():
     scope=config.GUILD_ID,
     options=c.Options.SERVERS
 )
+@autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game: str = None):
     await h.servers_cmd(ctx, server, game)
 
@@ -53,6 +55,7 @@ async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game
     scope=config.GUILD_ID,
     options=c.Options.TRAFFIC
 )
+@autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
     await h.traffic_cmd(ctx, location, server, game)
 
@@ -63,6 +66,7 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
     scope=config.GUILD_ID,
     options=c.Options.PLAYER
 )
+@autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str = None):
     await h.player_cmd(ctx, id, name, STEAM_API_KEY)
 
@@ -73,6 +77,7 @@ async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str
     scope=config.GUILD_ID,
     options=c.Options.EVENTS
 )
+@autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def events_cmd(ctx: interactions.CommandContext, id: int = None):
     await h.events_cmd(ctx, id)
 
@@ -82,6 +87,7 @@ async def events_cmd(ctx: interactions.CommandContext, id: int = None):
     description=c.Description.CACHE,
     scope=config.ADMIN_GUILD_ID
 )
+@autodefer(ephemeral=True)
 async def cache_cmd(ctx: interactions.CommandContext):
     await h.cache_cmd(ctx)
 
