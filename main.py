@@ -27,8 +27,8 @@ bot = interactions.Client(token=TOKEN,
                               activities=[interactions.PresenceActivity(
                                   name="TruckersMP Stats", type=interactions.PresenceActivityType.WATCHING)]))
 
-if not startup.checks(TOKEN):
-    print("Failed startup checks; Check log file for info")
+if not startup.checks(TOKEN, STEAM_API_KEY, config.GUILD_ID, config.ADMIN_GUILD_ID, config.EPHEMERAL_RESPONSES):
+    print("Failed startup checks; Check log file (log.log) for info")
     quit(1)
 
 
@@ -40,7 +40,7 @@ async def on_ready():
 @bot.command(
     name=c.Name.SERVERS,
     description=c.Description.SERVERS,
-    scope=config.TEST_GUILD_ID,
+    scope=config.GUILD_ID,
     options=c.Options.SERVERS
 )
 async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game: str = None):
@@ -50,7 +50,7 @@ async def servers_cmd(ctx: interactions.CommandContext, server: int = None, game
 @bot.command(
     name=c.Name.TRAFFIC,
     description=c.Description.TRAFFIC,
-    scope=config.TEST_GUILD_ID,
+    scope=config.GUILD_ID,
     options=c.Options.TRAFFIC
 )
 async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, server: str = None, game: str = None):
@@ -60,7 +60,7 @@ async def traffic_cmd(ctx: interactions.CommandContext, location: str = None, se
 @bot.command(
     name=c.Name.PLAYER,
     description=c.Description.PLAYER,
-    scope=config.TEST_GUILD_ID,
+    scope=config.GUILD_ID,
     options=c.Options.PLAYER
 )
 async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str = None):
@@ -70,7 +70,7 @@ async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str
 @bot.command(
     name=c.Name.EVENTS,
     description=c.Description.EVENTS,
-    scope=config.TEST_GUILD_ID,
+    scope=config.GUILD_ID,
     options=c.Options.EVENTS
 )
 async def events_cmd(ctx: interactions.CommandContext, id: int = None):
@@ -80,7 +80,7 @@ async def events_cmd(ctx: interactions.CommandContext, id: int = None):
 @bot.command(
     name=c.Name.CACHE,
     description=c.Description.CACHE,
-    scope=config.TEST_GUILD_ID
+    scope=config.ADMIN_GUILD_ID
 )
 async def cache_cmd(ctx: interactions.CommandContext):
     await h.cache_cmd(ctx)

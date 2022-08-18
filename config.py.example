@@ -1,8 +1,11 @@
 # The following file is an example which works as the default config file.
 # Create a copy named config.py and edit options as suitable.
 
-# Provide a guild ID here to set commands to guild only. Otherwise, set to None
-TEST_GUILD_ID = None
+# Provide a guild ID here to set commands to a single guild only. Otherwise, set to None.
+GUILD_ID = None
 
-# Whether responses to slash commands should be only be shown to the command author/instigator
+# Provide a guild ID for debug/admin commands (eg. /cache).
+ADMIN_GUILD_ID = 0 # Change this!
+
+# Whether responses to slash commands should be only be shown to the command author/instigator.
 EPHEMERAL_RESPONSES = False

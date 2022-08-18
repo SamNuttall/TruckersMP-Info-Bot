@@ -95,7 +95,7 @@ class Options:
     ]
     PLAYER = [
         Option(
-            type=OptionType.INTEGER,
+            type=OptionType.STRING,  # SteamID is too big for an integer
             name=OptionName.ID,
             description=OptionDescription.PLAYER_ID,
             required=False
