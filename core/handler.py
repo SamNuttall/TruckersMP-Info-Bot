@@ -1,5 +1,7 @@
 import asyncio
 import sys
+
+import interactions
 from interactions import CommandContext
 from core import assemble, data, embed, format, util
 from datetime import datetime
@@ -151,6 +153,30 @@ async def cache_cmd(ctx, owner_id):
         return
     info = util.get_cache_info()
     await ctx.send(f":file_folder: **Caches** | Chars: {len(info)}```{util.get_cache_info()}```", ephemeral=True)
+
+
+async def feedback_cmd(ctx):
+    modal = interactions.Modal(
+        custom_id="feedback_form",
+        title="Alfie Feedback Form",
+        components=[
+            interactions.TextInput(
+                custom_id="subject_input",
+                label="Subject (optional)",
+                style=interactions.TextStyleType.SHORT,
+                required=False,
+                max_length=50
+            ),
+            interactions.TextInput(
+                custom_id="content_input",
+                label="Give feedback, bug reports or comments here!",
+                style=interactions.TextStyleType.PARAGRAPH,
+                required=True,
+                min_length=10
+            )
+        ]
+    )
+    await ctx.popup(modal)
 
 
 async def autocomplete_server(ctx, user_input: str):

@@ -26,6 +26,7 @@ class Name:
     CACHE = "cache"
     INFO = "info"
     DEV_INFO = "devinfo"
+    FEEDBACK = "feedback"
 
 
 class Description:
@@ -36,6 +37,7 @@ class Description:
     CACHE = "Get information about the caches (admin)"
     INFO = "Get information about the bot"
     DEV_INFO = "Get information about the bot backend (admin)"
+    FEEDBACK = "Give feedback to the bot developer (opens a form, max submission of one a day)"
 
 
 class OptionName:

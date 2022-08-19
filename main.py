@@ -103,6 +103,17 @@ async def info_cmd(ctx: interactions.CommandContext):
 
 
 @bot.command(
+    name=c.Name.FEEDBACK,
+    description=c.Description.FEEDBACK,
+    scope=config.GUILD_ID,
+    dm_permission=True
+)
+@autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
+async def feedback_cmd(ctx: interactions.CommandContext):
+    await h.feedback_cmd(ctx)
+
+
+@bot.command(
     name=c.Name.DEV_INFO,
     description=c.Description.DEV_INFO,
     scope=config.ADMIN_GUILD_ID
