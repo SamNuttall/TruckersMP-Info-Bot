@@ -9,6 +9,12 @@ from core.attribute import ServerAttributes
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 
 
+async def generic_embed(title: str):
+    return Embed(
+        title=title,
+        color=0xFF0000
+    )
+
 async def item_not_found(item: str):
     return Embed(
         title=f":mag: {item} not found",

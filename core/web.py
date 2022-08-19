@@ -5,7 +5,7 @@ from interactions.base import get_logger
 logger = get_logger("general")
 
 
-async def get_request(url: str, headers: dict = None, params: dict = None, timeout: int = 10, limiter = None):
+async def get_request(url: str, headers: dict = None, params: dict = None, timeout: int = 10, limiter=None):
     """
     Makes a web get request (eg. to an API) for JSON.
 

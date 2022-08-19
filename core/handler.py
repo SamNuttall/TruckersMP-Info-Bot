@@ -8,12 +8,13 @@ from datetime import datetime, timedelta
 from interactions.base import get_logger
 from truckersmp.cache import Cache
 import config
-from truckersmp import TruckersMP
+from truckersmp import TruckersMP, exceptions
+from truckersmp.base import execute
 
 logger = get_logger("general")
 truckersmp = TruckersMP(logger=logger)
 
-feedback_cache = Cache(time_to_live=timedelta(days=1))
+feedback_cache = Cache(name="feedback", time_to_live=timedelta(days=1))
 
 
 def log(ctx, name, is_cmd: bool = True):
@@ -23,20 +24,24 @@ def log(ctx, name, is_cmd: bool = True):
     logger.debug(f"Handle {req_type} Request: {name} | guild: {guild} & user: {author}")
 
 
+async def send_generic_error(ctx):
+    logger.error("Returned something went wrong message to user")
+    await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
+
+
 async def servers_cmd(ctx: CommandContext, server: int, game: str):
     log(ctx, "servers")
 
     if server and game:
         game = None
-
     server_id = server
-    servers, ingame_time = await asyncio.gather(
-        truckersmp.get_servers(), data.get_ingame_time()
-    )
-    if servers is None:
-        logger.error("Returned something went wrong message to user: no servers found")
-        await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
+
+    try:
+        servers = await execute(truckersmp.get_servers, None, send_generic_error)
+    except exceptions.ExecuteError:
         return
+    ingame_time = await data.get_ingame_time()
+
     if not server_id:
         await ctx.send(
             embeds=await embed.servers_stats(servers, game, await format.format_time(ingame_time)),
@@ -78,6 +83,9 @@ async def traffic_cmd(ctx, location: str, server: str, game: str):
 async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
     log(ctx, "player")
 
+    if not player_id and not player_name:
+        await ctx.send(embeds=await embed.generic_embed("Provide a player ID or name"), ephemeral=True)
+
     if player_name:
         steam_id = await data.get_steamid_via_vanityurl(steam_key, player_name)
         if steam_id['error']:
@@ -89,18 +97,20 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
             await ctx.send(embeds=await embed.item_not_found_detailed("Player", desc),
                            ephemeral=config.EPHEMERAL_RESPONSES)
         player_id = steam_id
-    player = await truckersmp.get_player(player_id)
-    if player is False:
-        await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
-        return
-    elif player is None:
+
+    async def player_not_found():
         if player_name:
-            desc = f"A Steam [user](https://steamcommunity.com/profiles/{player_id}) was, but they are " \
+            description = f"A Steam [user](https://steamcommunity.com/profiles/{player_id}) was, but they are " \
                    "not a TruckersMP player"
-            await ctx.send(embeds=await embed.item_not_found_detailed("Player", desc),
+            await ctx.send(embeds=await embed.item_not_found_detailed("Player", description),
                            ephemeral=config.EPHEMERAL_RESPONSES)
             return
         await ctx.send(embeds=await embed.item_not_found("Player"), ephemeral=config.EPHEMERAL_RESPONSES)
+        return
+
+    try:
+        player = await execute(truckersmp.get_player, player_not_found, send_generic_error, player_id)
+    except exceptions.ExecuteError:
         return
     await ctx.send(embeds=await embed.player_stats(player), ephemeral=config.EPHEMERAL_RESPONSES)
 
@@ -109,22 +119,23 @@ async def events_cmd(ctx, event_id: int):
     log(ctx, "events")
 
     if event_id:
-        event = await truckersmp.get_event(event_id)
-        if event is False:
-            await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
-            return
-        elif event is None:
+        async def event_not_found():
             await ctx.send(embeds=await embed.item_not_found("Event"), ephemeral=config.EPHEMERAL_RESPONSES)
+
+        try:
+            event = await execute(truckersmp.get_event, event_not_found, send_generic_error, event_id)
+        except exceptions.ExecuteError:
             return
         await ctx.send(embeds=await embed.event_stats(event), ephemeral=config.EPHEMERAL_RESPONSES)
         return
+
     else:
-        events = await truckersmp.get_events()
-        if events is False:
-            await ctx.send(embeds=await embed.generic_error(), ephemeral=config.EPHEMERAL_RESPONSES)
-            return
-        elif events is None:
+        async def events_not_found():
             await ctx.send(embeds=await embed.item_not_found("Events"), ephemeral=config.EPHEMERAL_RESPONSES)
+
+        try:
+            events = await execute(truckersmp.get_events, events_not_found, send_generic_error)
+        except exceptions.ExecuteError:
             return
         await ctx.send(embeds=await embed.events_stats(events.featured), ephemeral=config.EPHEMERAL_RESPONSES)
 
@@ -159,7 +170,6 @@ async def cache_cmd(ctx, owner_id):
 
 
 async def feedback_cmd(ctx):
-
     if feedback_cache.get(ctx.author.id) is not None:
         await ctx.send("You have already sent feedback within the last 24 hours. Try again later.", ephemeral=True)
         return
@@ -180,7 +190,8 @@ async def feedback_cmd(ctx):
                 label="Give feedback, bug reports or comments here!",
                 style=interactions.TextStyleType.PARAGRAPH,
                 required=True,
-                min_length=10
+                min_length=10,
+                max_length=3600  # Allow space for other information
             )
         ]
     )
