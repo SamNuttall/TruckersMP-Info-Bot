@@ -17,7 +17,7 @@ async def get_location_field(location: dict):
     lo = LocationAttributes(location)
     return EmbedField(
         name=lo.trimmed_name,
-        value=f"{lo.game_emoji} **{lo.server_name}\nPlayers:** {lo.players} {INVISIBLE_CHAR}\n{lo.severity_bar}",
+        value=f"{lo.game_emoji} **{lo.trimmed_server_name}\nPlayers:** {lo.players} {INVISIBLE_CHAR}\n{lo.severity_bar}",
         inline=True,
     )
 

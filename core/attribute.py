@@ -129,6 +129,7 @@ class LocationAttributes:
         self.severity_bar = TRAFFIC_SEVERITY[self.severity][1]
 
         self.server_name = self.server[TrafficServer.name]
+        self.trimmed_server_name = util.trim_string(self.server_name, 12)
         self.server_short_name = self.server[TrafficServer.short_name]
 
         self.server_formatted_name = self.server_short_name

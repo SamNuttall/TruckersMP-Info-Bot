@@ -40,14 +40,14 @@ async def format_fields(fields: list, expected_length: int = 9):
         ))
     if input_len == 0:
         fields.append(EmbedField(
-            name=":cry: All locations have no players",
-            value=f"I've searched all over this server but it looks like all locations have no players.",
+            name="No Results!",
+            value=f"**:cry: All locations have no players.**",
             inline=False,
         ))
     elif input_len < expected_length:
         fields.append(EmbedField(
-            name="Other locations have no players",
-            value=f"All other locations have no traffic",
+            name="⠀",
+            value=f"*:cry: Showing {input_len} locations; all others have no players.*",
             inline=False,
         ))
     return fields
