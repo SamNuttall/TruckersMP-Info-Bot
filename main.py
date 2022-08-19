@@ -133,6 +133,11 @@ async def cache_cmd(ctx: interactions.CommandContext):
     await h.cache_cmd(ctx, config.OWNER_ID)
 
 
+@bot.modal("feedback_form")
+async def on_feedback_modal(ctx, subject, content):
+    await h.on_feedback_modal(ctx, bot, subject, content)
+
+
 @bot.autocomplete(command=c.Name.SERVERS, name=c.OptionName.SERVER)
 async def autocomplete_server(ctx, user_input: str = ""):
     await h.autocomplete_server(ctx, user_input)

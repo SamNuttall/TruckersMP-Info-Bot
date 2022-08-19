@@ -10,6 +10,9 @@ ADMIN_GUILD_ID = 0  # Change this!
 # Whether responses to slash commands should be only be shown to the command author/instigator.
 EPHEMERAL_RESPONSES = False
 
+# Provide a channel ID for feedback to be sent too
+FEEDBACK_CHANNEL_ID = 0  # Change this!
+
 BOT_AVATAR_URL = "https://example.com"  # Change this!
 BOT_INVITE_URL = "https://example.com"
 PRIVACY_POLICY_URL = "https://example.com"

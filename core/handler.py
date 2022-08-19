@@ -4,13 +4,16 @@ import sys
 import interactions
 from interactions import CommandContext
 from core import assemble, data, embed, format, util
-from datetime import datetime
+from datetime import datetime, timedelta
 from interactions.base import get_logger
+from truckersmp.cache import Cache
 import config
 from truckersmp import TruckersMP
 
 logger = get_logger("general")
 truckersmp = TruckersMP(logger=logger)
+
+feedback_cache = Cache(time_to_live=timedelta(days=1))
 
 
 def log(ctx, name, is_cmd: bool = True):
@@ -156,6 +159,11 @@ async def cache_cmd(ctx, owner_id):
 
 
 async def feedback_cmd(ctx):
+
+    if feedback_cache.get(ctx.author.id) is not None:
+        await ctx.send("You have already sent feedback within the last 24 hours. Try again later.", ephemeral=True)
+        return
+
     modal = interactions.Modal(
         custom_id="feedback_form",
         title="Alfie Feedback Form",
@@ -209,6 +217,14 @@ async def autocomplete_traffic_servers(ctx, user_input: str):
         await ctx.populate(
             await assemble.get_server_choices(servers['servers'], user_input)
         )
+
+
+async def on_feedback_modal(ctx, bot, subject, content):
+    feedback_cache.add(ctx.author.id, True)
+    await ctx.send("Thanks for your feedback!", ephemeral=True)
+    channel = await interactions.get(bot, interactions.Channel, object_id=config.FEEDBACK_CHANNEL_ID)
+    await channel.send(f"**From:** {ctx.user.username}#{ctx.user.discriminator} ({ctx.user.id})"
+                       f"\n**Subject:**{subject}\n**Content:**\n{content}")
 
 
 async def on_ready(bot):
