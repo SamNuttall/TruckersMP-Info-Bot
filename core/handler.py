@@ -36,8 +36,11 @@ async def servers_cmd(ctx: CommandContext, server: int, game: str):
         game = None
     server_id = server
 
+    async def error():
+        await send_generic_error(ctx)
+
     try:
-        servers = await execute(truckersmp.get_servers, None, send_generic_error)
+        servers = await execute(truckersmp.get_servers, None, error)
     except exceptions.ExecuteError:
         return
     ingame_time = await data.get_ingame_time()
@@ -108,8 +111,11 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
         await ctx.send(embeds=await embed.item_not_found("Player"), ephemeral=config.EPHEMERAL_RESPONSES)
         return
 
+    async def error():
+        await send_generic_error(ctx)
+
     try:
-        player = await execute(truckersmp.get_player, player_not_found, send_generic_error, player_id)
+        player = await execute(truckersmp.get_player, player_not_found, error, player_id)
     except exceptions.ExecuteError:
         return
     await ctx.send(embeds=await embed.player_stats(player), ephemeral=config.EPHEMERAL_RESPONSES)
@@ -118,12 +124,15 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
 async def events_cmd(ctx, event_id: int):
     log(ctx, "events")
 
+    async def error():
+        await send_generic_error(ctx)
+
     if event_id:
         async def event_not_found():
             await ctx.send(embeds=await embed.item_not_found("Event"), ephemeral=config.EPHEMERAL_RESPONSES)
 
         try:
-            event = await execute(truckersmp.get_event, event_not_found, send_generic_error, event_id)
+            event = await execute(truckersmp.get_event, event_not_found, error, event_id)
         except exceptions.ExecuteError:
             return
         await ctx.send(embeds=await embed.event_stats(event), ephemeral=config.EPHEMERAL_RESPONSES)
@@ -134,7 +143,7 @@ async def events_cmd(ctx, event_id: int):
             await ctx.send(embeds=await embed.item_not_found("Events"), ephemeral=config.EPHEMERAL_RESPONSES)
 
         try:
-            events = await execute(truckersmp.get_events, events_not_found, send_generic_error)
+            events = await execute(truckersmp.get_events, events_not_found, error)
         except exceptions.ExecuteError:
             return
         await ctx.send(embeds=await embed.events_stats(events.featured), ephemeral=config.EPHEMERAL_RESPONSES)

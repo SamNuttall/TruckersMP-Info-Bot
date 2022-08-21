@@ -10,6 +10,9 @@ ADMIN_GUILD_ID = 0  # Change this!
 # Whether responses to slash commands should be only be shown to the command author/instigator.
 EPHEMERAL_RESPONSES = False
 
+# Provide an owner ID (a user's Discord ID). This user can execute debug/admin commands.
+OWNER_ID = 0  # Change this!
+
 # Provide a channel ID for feedback to be sent too
 FEEDBACK_CHANNEL_ID = 0  # Change this!
 
