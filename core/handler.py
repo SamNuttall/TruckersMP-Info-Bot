@@ -99,6 +99,7 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
             desc = "Steam user not found with that Vanity URL"
             await ctx.send(embeds=await embed.item_not_found_detailed("Player", desc),
                            ephemeral=config.EPHEMERAL_RESPONSES)
+            return
         player_id = steam_id
 
     async def player_not_found():
