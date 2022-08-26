@@ -96,7 +96,9 @@ async def player_cmd(ctx, player_id: int, player_name: str, steam_key):
             return
         steam_id = steam_id['steam_id']
         if steam_id is None:
-            desc = "Steam user not found with that Vanity URL"
+            gist_url = "https://gist.github.com/SamNuttall/2530ac8ceccf2f93a8528eff2f820404"
+            desc = "Steam user not found with that Vanity URL\n" \
+                   f"> *[Why is player search bad?]({gist_url})*"
             await ctx.send(embeds=await embed.item_not_found_detailed("Player", desc),
                            ephemeral=config.EPHEMERAL_RESPONSES)
             return
