@@ -23,9 +23,13 @@ async def get_location_field(location: dict):
 
 
 async def get_event_field(event):
+    e = event
     start_time = await format.to_discord(await format.to_datetime(event.start_at))
-    url = f"https://truckersmp.com/events/{event.id}"
     return EmbedField(
         name=event.name,
-        value=f"***{event.game}** - {event.server.name}*\n{start_time}\nID: {event.id} | [View details]({url})"
+        value=(
+            f":round_pushpin: {e.departure.location}, {e.departure.city}\n"
+            f":alarm_clock: {start_time}\n"
+            f":desktop: {e.server.name} ({e.game})\n"
+        )
     )
