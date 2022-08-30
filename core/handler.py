@@ -138,7 +138,19 @@ async def events_cmd(ctx, event_id: int):
             event = await execute(truckersmp.get_event, event_not_found, error, event_id)
         except exceptions.ExecuteError:
             return
-        await ctx.send(embeds=await embed.event_stats(event), ephemeral=config.EPHEMERAL_RESPONSES)
+        if event.vtc.id != 0:  # Add an avatar
+            try:
+                vtc = await execute(truckersmp.get_vtc, event_not_found, error, event.vtc.id)
+                avatar = vtc.logo
+            except exceptions.ExecuteError:
+                return
+        else:
+            try:
+                owner = await execute(truckersmp.get_player, event_not_found, error, event.user.id)
+                avatar = owner.avatar
+            except exceptions.ExecuteError:
+                return
+        await ctx.send(embeds=await embed.event_stats(event, avatar), ephemeral=config.EPHEMERAL_RESPONSES)
         return
 
     else:

@@ -280,23 +280,37 @@ async def events_stats(events: list):
     )
 
 
-async def event_stats(event: Event):
+async def event_stats(event: Event, avatar: str):
     """Takes a specific event and creates an embed from them"""
     e = event
     start_time = await format.to_discord(await format.to_datetime(e.start_at))
-    description = (
-        f"**{e.name}**\n"
-        f"*{e.game} - {e.server.name}*\n"
-        f"{start_time}\n\n"
-        f"> :id: **ID:** {e.id}\n"
-        f"> :speech_left: **Language:** {e.language}\n"
+    if type(e.dlcs) is not dict:
+        dlc_list_str = "None"
+    else:
+        dlc_list = list(e.dlcs.values())
+        dlc_list_str = dlc_list[0]
+        if len(dlc_list) > 1:
+            dlc_list_str += f" *(+{len(dlc_list) - 1} others)*"
 
+    description = (
+        f"__Information__\n"
+        f":round_pushpin: **Location:** {e.departure.location}, {e.departure.city}\n"
+        f":house: **Destination:** {e.arrive.location}, {e.arrive.city}\n"
+        f":alarm_clock: **Time:** {start_time}\n"
+        f":desktop: **Server:** {e.server.name}\n"
+        f":video_game: **Game:** {e.game}\n"
+        f"\n"
+        f"__Details__\n"
+        f":map: **DLCs Required:** {dlc_list_str}\n"
+        f":busts_in_silhouette: **Attendances:** {e.attendances.confirmed} *({e.attendances.unsure} unsure)*\n"
+        f":bust_in_silhouette: **Creator:** [{e.user.username}](https://truckersmp.com/user/{e.user.id})"
     )
 
     return Embed(
-        title=f":bust_in_silhouette: TruckersMP | Event Information",
+        title=f"{e.name}",
         url=f"https://truckersmp.com/events/{e.id}",
-        image=EmbedImageStruct(url=e.banner),
+        image=EmbedImageStruct(url=e.map),
+        thumbnail=EmbedImageStruct(url=avatar)._json,
         description=description,
         color=EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
