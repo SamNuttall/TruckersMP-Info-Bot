@@ -260,14 +260,15 @@ async def player_stats(player: Player):
     )
 
 
-async def events_stats(events: list):
+async def events_stats(events: list, list_name: str = "Events", max_size: int = 5):
     fields = []
-    for event in events:
+    for index, event in enumerate(events, 1):
         fields.append(await embed_fields.get_event_field(event))
-    fields = await format_fields(fields, 0)
+        if index == max_size:
+            break
 
     return Embed(
-        title=f":truck: TruckersMP | Events",
+        title=f":truck: TruckersMP | {list_name}",
         url="https://truckersmp.com/events",
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         color=EMBED_COLOUR,

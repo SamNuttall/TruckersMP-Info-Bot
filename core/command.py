@@ -1,5 +1,5 @@
 import interactions
-from interactions import Option, OptionType
+from interactions import Option, OptionType, SelectOption, Emoji
 from core import assemble
 
 
@@ -121,3 +121,50 @@ class Options:
             required=False
         )
     ]
+
+
+class Components:
+    class SelectMenu:
+        EVENTS = "events_selectmenu"
+
+        @staticmethod
+        def get_events(default: str = "featured"):
+            options = {
+                'featured': {
+                    'label': "Featured",
+                    'value': "featured",
+                    'desc': "See events featured by TruckersMP",
+                    'emoji': Emoji(name="⭐")
+                },
+                'upcoming': {
+                    'label': "Upcoming",
+                    'value': "upcoming",
+                    'desc': "See events which are starting soonest",
+                    'emoji': Emoji(name="📆")
+                },
+                'now': {
+                    'label': "Now",
+                    'value': "now",
+                    'desc': "See events which are happening now",
+                    'emoji': Emoji(name="🚚")
+                }
+            }
+
+            selectmenu_options = list()
+            for option in options.items():
+                title = option[0]
+                data = option[1]
+                is_default = title == default
+                selectmenu_options.append(
+                    SelectOption(label=data['label'],
+                                 value=data['value'],
+                                 description=data['desc'],
+                                 emoji=data['emoji'],
+                                 default=is_default
+                                 )
+                )
+
+            return interactions.SelectMenu(
+                custom_id=Components.SelectMenu.EVENTS,
+                options=selectmenu_options
+            )

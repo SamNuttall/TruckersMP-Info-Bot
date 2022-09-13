@@ -37,6 +37,8 @@ bot = interactions.Client(token=TOKEN,
                               ]
                           ))
 
+events_embeds = {}
+
 
 @bot.event
 async def on_ready():
@@ -88,7 +90,10 @@ async def player_cmd(ctx: interactions.CommandContext, id: int = None, name: str
 )
 @autodefer(ephemeral=config.EPHEMERAL_RESPONSES)
 async def events_cmd(ctx: interactions.CommandContext, id: int = None):
-    await h.events_cmd(ctx, id)
+    embeds = await h.events_cmd(ctx, id)
+    if embeds is not None:
+        global events_embeds
+        events_embeds = embeds
 
 
 @bot.command(
@@ -131,6 +136,14 @@ async def devinfo_cmd(ctx: interactions.CommandContext):
 @autodefer(ephemeral=True)
 async def cache_cmd(ctx: interactions.CommandContext):
     await h.cache_cmd(ctx, config.OWNER_ID)
+
+
+@bot.component(c.Components.SelectMenu.EVENTS)
+async def selectmenu_test(ctx: interactions.ComponentContext, value):
+    global events_embeds
+    list_type = value[0]
+    sm = c.Components.SelectMenu.get_events(default=list_type)
+    await ctx.edit(embeds=events_embeds[list_type], components=sm)
 
 
 @bot.modal("feedback_form")

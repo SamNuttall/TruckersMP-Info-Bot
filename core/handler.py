@@ -3,7 +3,7 @@ import sys
 
 import interactions
 from interactions import CommandContext
-from core import assemble, data, embed, format, util
+from core import assemble, data, embed, format, util, command
 from datetime import datetime, timedelta
 from interactions.base import get_logger
 from truckersmp.cache import Cache
@@ -161,7 +161,17 @@ async def events_cmd(ctx, event_id: int):
             events = await execute(truckersmp.get_events, events_not_found, error)
         except exceptions.ExecuteError:
             return
-        await ctx.send(embeds=await embed.events_stats(events.featured), ephemeral=config.EPHEMERAL_RESPONSES)
+
+        sm = command.Components.SelectMenu.get_events()
+        await ctx.send(embeds=await embed.events_stats(events.featured, "Featured Events"),
+                       ephemeral=config.EPHEMERAL_RESPONSES,
+                       components=sm
+                       )
+        return {
+            'featured': await embed.events_stats(events.featured, "Featured Events"),
+            'upcoming': await embed.events_stats(events.upcoming, "Upcoming Events"),
+            'now': await embed.events_stats(events.now, "Events on Now")
+        }
 
 
 async def info_cmd(ctx, conf):
@@ -176,9 +186,13 @@ async def devinfo_cmd(ctx, bot, owner_id):
     if ctx.author.user.id != owner_id:
         await ctx.send("You do not have permission to use this command.", ephemeral=True)
         return
+    guilds = ""
+    for i, guild in enumerate(bot.guilds):
+        guilds += f"[{i}] {guild.id} - {guild.name}\n"
     content = ("```"
                f"Num of Guilds: {len(bot.guilds)}\n"
-               f"Py Version: {sys.version}"
+               f"Py Version: {sys.version}\n\n"
+               f"Guilds:\n{guilds}"
                "```"
                )
     await ctx.send(content, ephemeral=True)
