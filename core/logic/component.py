@@ -6,14 +6,42 @@ from core.discord import component as dc
 from core.interface import base as i
 
 
+class Button:
+    @staticmethod
+    async def event_back(ctx):
+        await ctx.edit(
+            embeds=await i.Events.overview(),
+            components=interactions.spread_to_rows(
+                dc.SelectMenu.get_event_lists(),
+                await dc.SelectMenu.get_event_selector()
+            )
+        )
+
+
 class SelectMenu:
     @staticmethod
     async def events(ctx, value):
         list_type = value[0]
-        components = dc.SelectMenu.get_event_lists(default=list_type)
+        components = interactions.spread_to_rows(
+                dc.SelectMenu.get_event_lists(default=list_type),
+                await dc.SelectMenu.get_event_selector(list_type)
+        )
         await ctx.edit(
             embeds=await i.Events.overview(list_type),
             components=components
+        )
+
+    @staticmethod
+    async def events_selector(ctx, value):
+        event_id = value[0]
+        await ctx.edit(
+            embeds=await i.Events.singular(event_id),
+            components=interactions.Button(
+                style=interactions.ButtonStyle.SECONDARY,
+                label="Go Back to Overview",
+                emoji=interactions.Emoji(name="🗓️"),
+                custom_id=dc.Button.EVENT_BACK
+            )
         )
 
 

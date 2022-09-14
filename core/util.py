@@ -61,3 +61,15 @@ def get_server_via_id(servers: list, id: int):
     for server in servers:
         if server.id == id:
             return server
+
+
+def get_list_from_events(events, list_type: str = "Featured"):
+    """Get a specific list (eg. Featured, Now) from an Events response"""
+    match list_type:
+        case "featured":
+            events = events.featured
+        case "upcoming":
+            events = events.upcoming
+        case _:
+            events = events.now
+    return events

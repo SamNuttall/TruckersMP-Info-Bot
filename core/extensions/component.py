@@ -8,9 +8,17 @@ from core.public import bot
 
 class ComponentCog(interactions.Extension):
 
+    @extension_component(dc.Button.EVENT_BACK)
+    async def event_back_button(self, ctx: ComponentContext):
+        await lc.Button.event_back(ctx)
+
     @extension_component(dc.SelectMenu.EVENTS)
-    async def selectmenu_test(self, ctx: ComponentContext, value):
+    async def event_lists_selectmenu(self, ctx: ComponentContext, value):
         await lc.SelectMenu.events(ctx, value)
+
+    @extension_component(dc.SelectMenu.EVENTS_SELECTOR)
+    async def event_selector_selectmenu(self, ctx: ComponentContext, value):
+        await lc.SelectMenu.events_selector(ctx, value)
 
     @extension_modal("feedback_form")
     async def on_feedback_modal(self, ctx, subject, content):

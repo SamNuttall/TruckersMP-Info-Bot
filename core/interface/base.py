@@ -109,14 +109,12 @@ class Events:
             return embed.generic_error()
         match list_type:
             case "featured":
-                events = events.featured
                 list_name = "Featured Events"
             case "upcoming":
-                events = events.upcoming
                 list_name = "Upcoming Events"
             case _:
-                events = events.now
                 list_name = "Events on Now"
+        events = util.get_list_from_events(events, list_type)
         return embed.events_stats(
             events=events,
             list_name=list_name

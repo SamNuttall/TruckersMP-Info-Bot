@@ -2,6 +2,15 @@
 
 import interactions
 from interactions import Emoji, SelectOption
+from truckersmp import exceptions
+from truckersmp.base import execute
+
+from core import util
+from core.public import truckersmp
+
+
+class Button:
+    EVENT_BACK = "event-back-btn"
 
 
 class SelectMenu:
@@ -66,8 +75,24 @@ class SelectMenu:
         )
 
     @staticmethod
-    async def get_event_list():
-        return
+    async def get_event_selector(list_type: str = "featured"):
+        try:
+            events = await execute(truckersmp.get_events)
+        except exceptions.ExecuteError:
+            return SelectMenu._empty("Failed to load events.")
+        options = list()
+        events = util.get_list_from_events(events, list_type)
+        for event in events:
+            options.append(SelectOption(
+                label=event.name,
+                description=util.format_time(event.start_at, '%a, %d %B %Y'),
+                value=event.id
+            ))
+        return interactions.SelectMenu(
+            custom_id=SelectMenu.EVENTS_SELECTOR,
+            options=options,
+            placeholder="Select an event for details"
+        )
 
 
 class Modal:

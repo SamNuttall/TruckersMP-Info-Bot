@@ -1,5 +1,6 @@
 import sys
 
+import interactions
 from interactions import CommandContext
 
 import config
@@ -55,7 +56,10 @@ class Public:
             components = None
         else:
             embeds_func = i.Events.overview()
-            components = dc.SelectMenu.get_event_lists()
+            components = interactions.spread_to_rows(
+                dc.SelectMenu.get_event_lists(),
+                await dc.SelectMenu.get_event_selector()
+            )
 
         await ctx.send(embeds=await embeds_func,
                        ephemeral=config.EPHEMERAL_RESPONSES,
