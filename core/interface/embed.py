@@ -1,4 +1,5 @@
 # Core; Interface: Embed
+# Gathers data and creates embeds from it.
 
 from datetime import datetime
 

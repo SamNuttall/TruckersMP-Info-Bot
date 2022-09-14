@@ -1,4 +1,5 @@
 # Core; Interface; Base
+# Gets embeds ready for the use in messages.
 
 from truckersmp import exceptions
 from truckersmp.base import execute

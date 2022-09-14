@@ -1,8 +1,6 @@
 # Core: Data
 # Handles getting data required by the bot.
 
-# TODO: Refactor some functions to use async-truckersmp cache and execute func
-
 import asyncio
 
 from datetime import datetime, timezone, timedelta

@@ -1,4 +1,5 @@
 # Core; Discord: Component
+# Stores and creates components used throughout the bot
 
 import interactions
 from interactions import Emoji, SelectOption

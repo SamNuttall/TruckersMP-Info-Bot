@@ -1,3 +1,5 @@
+# Core; Extensions: Autocomplete
+
 import interactions
 from interactions import extension_autocomplete
 

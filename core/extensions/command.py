@@ -1,3 +1,5 @@
+# Core; Extensions: Command
+
 import interactions
 from interactions import autodefer, extension_command, CommandContext
 

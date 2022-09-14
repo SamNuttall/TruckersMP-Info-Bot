@@ -1,3 +1,5 @@
+# Core; Extensions: Component
+
 import interactions
 from interactions import extension_component, extension_modal, ComponentContext
 

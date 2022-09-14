@@ -1,4 +1,5 @@
 # Core; Discord: Command
+# Stores attributes used for commands.
 
 from interactions import Option, OptionType
 
