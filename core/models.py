@@ -1,9 +1,15 @@
-from core.emoji import Emoji, TRAFFIC_SEVERITY
-from core import util
+# Core: Models
+# Defines classes to create a model of what we expect an API to return.
+# Models here are only for non async-truckersmp related objects or to aid the visualisation of data.
+# Functions defined here aid the creation of models, often by adding more data.
+
 import re
 
+from core import util
+from core.interface.emoji import Emoji, TRAFFIC_SEVERITY
 
-class TrafficServer:
+
+class TrafficServerAttributes:
     """Stores the attributes (even if not used) of a traffic server"""
     name = "name"  # str
     url = "url"  # str
@@ -11,7 +17,7 @@ class TrafficServer:
     game = "game"  # str
 
 
-class Location:
+class LocationAttributes:
     """Stores the attributes (even if not used) of a location"""
     name = "name"  # str
     players = "players"  # int
@@ -62,7 +68,15 @@ def get_server_type(name: str, is_event: bool = False):
     return ServerType.community_event
 
 
-class ServerAttributes:
+class TrafficServer:
+    def __init__(self, server):
+        self.name = server[TrafficServerAttributes.name]
+        self.url = server[TrafficServerAttributes.url]
+        self.short_name = server[TrafficServerAttributes.short_name]
+        self.game = server[TrafficServerAttributes.game]
+
+
+class Server:
     """Add format attributes of a specific server ready for use in embeds"""
 
     def __init__(self, server,
@@ -114,24 +128,24 @@ class ServerAttributes:
         )
 
 
-class LocationAttributes:
+class Location:
 
     def __init__(self, location):
-        self.server = location[Location.server]
-        self.name = location[Location.name]
+        self.server = location[LocationAttributes.server]
+        self.name = location[LocationAttributes.name]
         self.trimmed_name = util.trim_string(self.name, 17)
-        self.game = location[Location.game].upper()
+        self.game = location[LocationAttributes.game].upper()
         self.game_emoji = Emoji.ETS2 if self.game == "ETS2" else Emoji.ATS
-        self.players = location[Location.players]
+        self.players = location[LocationAttributes.players]
 
-        self.severity = location[Location.severity]
+        self.severity = location[LocationAttributes.severity]
         self.severity_icon = TRAFFIC_SEVERITY[self.severity][0]
         self.severity_bar = TRAFFIC_SEVERITY[self.severity][1]
 
-        self.server_name = self.server[TrafficServer.name]
+        self.server_name = self.server[TrafficServerAttributes.name]
         self.trimmed_server_name = util.trim_string(self.server_name, 12)
-        self.server_short_name = self.server[TrafficServer.short_name]
+        self.server_short_name = self.server[TrafficServerAttributes.short_name]
 
         self.server_formatted_name = self.server_short_name
-        if "event" in self.server[TrafficServer.url]:
+        if "event" in self.server[TrafficServerAttributes.url]:
             self.server_formatted_name = util.trim_string(self.server_name, 9)

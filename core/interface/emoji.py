@@ -1,3 +1,9 @@
+# Core; Interface: Emoji
+# Handles Discord emoji used by the bot in it's messages.
+
+# TODO: Implement use_exclusive false mode
+# This will cause the bot not use the custom emojis.
+
 USE_EXCLUSIVE = True
 
 
@@ -40,4 +46,3 @@ TRAFFIC_SEVERITY = {
     'Congested': (Emoji.T_CON, f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_DEF}"),
     'Heavy': (Emoji.T_HEV, f"{Emoji.T_LOW} {Emoji.T_MOD} {Emoji.T_CON} {Emoji.T_HEV}")
 }
-

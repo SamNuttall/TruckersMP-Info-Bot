@@ -1,21 +1,8 @@
-import interactions
-from interactions import Option, OptionType, SelectOption, Emoji
-from core import assemble
+# Core; Discord: Command
 
+from interactions import Option, OptionType
 
-def get_command(bot: interactions.Client, command_name):
-    """
-    Get a command from cache using it's name
-
-    Args:
-        bot: interactions.Client = The bot client
-        command_name: Name = The name of the command
-    Returns:
-        ApplicationCommand
-    """
-    return bot._http.cache.interactions.get(
-        command_name
-    )
+from core.discord import choices
 
 
 class Name:
@@ -73,7 +60,7 @@ class Options:
             name=OptionName.GAME,
             description=OptionDescription.GAME,
             required=False,
-            choices=assemble.get_game_choices()
+            choices=choices.get_games()
         )
     ]
     TRAFFIC = [
@@ -96,7 +83,7 @@ class Options:
             name=OptionName.GAME,
             description=OptionDescription.TRAFFIC_GAME,
             required=False,
-            choices=assemble.get_game_choices()
+            choices=choices.get_games()
         )
     ]
     PLAYER = [
@@ -121,50 +108,3 @@ class Options:
             required=False
         )
     ]
-
-
-class Components:
-    class SelectMenu:
-        EVENTS = "events_selectmenu"
-
-        @staticmethod
-        def get_events(default: str = "featured"):
-            options = {
-                'featured': {
-                    'label': "Featured",
-                    'value': "featured",
-                    'desc': "See events featured by TruckersMP",
-                    'emoji': Emoji(name="⭐")
-                },
-                'upcoming': {
-                    'label': "Upcoming",
-                    'value': "upcoming",
-                    'desc': "See events which are starting soonest",
-                    'emoji': Emoji(name="📆")
-                },
-                'now': {
-                    'label': "Now",
-                    'value': "now",
-                    'desc': "See events which are happening now",
-                    'emoji': Emoji(name="🚚")
-                }
-            }
-
-            selectmenu_options = list()
-            for option in options.items():
-                title = option[0]
-                data = option[1]
-                is_default = title == default
-                selectmenu_options.append(
-                    SelectOption(label=data['label'],
-                                 value=data['value'],
-                                 description=data['desc'],
-                                 emoji=data['emoji'],
-                                 default=is_default
-                                 )
-                )
-
-            return interactions.SelectMenu(
-                custom_id=Components.SelectMenu.EVENTS,
-                options=selectmenu_options
-            )

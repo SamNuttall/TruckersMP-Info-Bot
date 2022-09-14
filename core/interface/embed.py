@@ -1,11 +1,14 @@
-from truckersmp.models import Player, Event
-from interactions import Embed, EmbedField, EmbedFooter, EmbedImageStruct
+# Core; Interface: Embed
+
 from datetime import datetime
 
-from core import field as embed_fields
-from core import util, format
-from core.attribute import ServerAttributes
+from interactions import Embed, EmbedField, EmbedImageStruct, EmbedFooter
+from truckersmp.models import Player, Event
 
+import core.util
+from core import util
+from core.interface import field as embed_fields
+from core.models import Server
 
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 BOT_AVATAR_URL = "https://i.imgur.com/pX5Q4zH.png"
@@ -13,7 +16,7 @@ EMBED_COLOUR = 0x826b59
 EMBED_ERROR_COLOUR = 0xFF0000
 
 
-async def generic_embed(title: str, colour=None):
+def generic_embed(title: str, colour=None):
     if colour is None:
         colour = EMBED_ERROR_COLOUR
     return Embed(
@@ -22,27 +25,27 @@ async def generic_embed(title: str, colour=None):
     )
 
 
-async def item_not_found(item: str):
+def item_not_found(item: str):
     return Embed(
         title=f":mag: {item} not found",
         color=EMBED_ERROR_COLOUR
     )
 
 
-async def item_not_found_detailed(item, desc):
-    embed = await item_not_found(item)
+def item_not_found_detailed(item, desc):
+    embed = item_not_found(item)
     embed.description = desc
     return embed
 
 
-async def generic_error():
+def generic_error():
     return Embed(
         title=f":neutral_face: Something went wrong...",
         color=EMBED_ERROR_COLOUR
     )
 
 
-async def format_fields(fields: list, expected_length: int = 9):
+def format_fields(fields: list, expected_length: int = 9):
     """Add extra fields to display extra info and align content"""
     input_len = len(fields)
     if len(fields) % 3 == 2:
@@ -66,10 +69,10 @@ async def format_fields(fields: list, expected_length: int = 9):
     return fields
 
 
-async def get_description(filter_by_server: str = None, filter_by_game: str = None, filter_by_location: str = None,
-                          total_players: int = None, max_total_players: int = None,
-                          total_in_queue: int = None, ingame_time: str = None,
-                          players_in_locations: int = None, players_in_traffic: int = None):
+def get_description(filter_by_server: str = None, filter_by_game: str = None, filter_by_location: str = None,
+                    total_players: int = None, max_total_players: int = None,
+                    total_in_queue: int = None, ingame_time: str = None,
+                    players_in_locations: int = None, players_in_traffic: int = None):
     """Get the description for an embed based on the filters"""
     description_start = f"\n:pencil: **Filtered by "
     description = ""
@@ -92,7 +95,7 @@ async def get_description(filter_by_server: str = None, filter_by_game: str = No
     return description
 
 
-async def servers_stats(servers: list, filter_by_game: str = None, ingame_time: str = None):
+def servers_stats(servers: list, filter_by_game: str = None, ingame_time: str = None):
     """Takes a list of servers and creates an embed from them"""
     fields = []
     total_players = 0
@@ -104,19 +107,19 @@ async def servers_stats(servers: list, filter_by_game: str = None, ingame_time: 
         total_players += server.players
         max_total_players += server.max_players
         total_in_queue += server.queue
-        fields.append(await embed_fields.get_server_field(server))
+        fields.append(embed_fields.get_server(server))
 
-    fields = await format_fields(fields, 0)
+    fields = format_fields(fields, 0)
     if not ingame_time:
         ingame_time = "Unknown"
     return Embed(
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
-        description=await get_description(filter_by_game=filter_by_game,
-                                          total_players=total_players,
-                                          max_total_players=max_total_players,
-                                          total_in_queue=total_in_queue,
-                                          ingame_time=ingame_time),
+        description=get_description(filter_by_game=filter_by_game,
+                                    total_players=total_players,
+                                    max_total_players=max_total_players,
+                                    total_in_queue=total_in_queue,
+                                    ingame_time=ingame_time),
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         color=EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
@@ -128,12 +131,12 @@ async def servers_stats(servers: list, filter_by_game: str = None, ingame_time: 
     )
 
 
-async def server_stats(server: dict, ingame_time: str = None):
+def server_stats(server: dict, ingame_time: str = None):
     """Takes a specific server and creates an embed from it"""
     if not ingame_time:
         ingame_time = "Unknown"
-    s = ServerAttributes(server, promods_if_disabled=":red_circle:")
-    description = await get_description(
+    s = Server(server, promods_if_disabled=":red_circle:")
+    description = get_description(
         filter_by_server=s.short_name.upper(),
         ingame_time=ingame_time
     )
@@ -170,8 +173,8 @@ async def server_stats(server: dict, ingame_time: str = None):
     )
 
 
-async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
-                        filter_by_location: str, limit: int = 9):
+def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
+                  filter_by_location: str, limit: int = 9):
     """Takes a list of traffic locations and creates an embed from them"""
     fields = []
     filter_bys = (filter_by_server, filter_by_game, filter_by_location)
@@ -186,24 +189,24 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
             continue
         if location['players'] == 0:
             break
-        fields.append(await embed_fields.get_location_field(location))
+        fields.append(embed_fields.get_location(location))
         players_in_locations += location['players']
         players_in_traffic += location['playersInvolvedInTrafficJams']
         if len(fields) >= limit:
             break
 
-    fields = await format_fields(fields, limit)
+    fields = format_fields(fields, limit)
     if filter_by_server:
         filter_by_server = filter_by_server.capitalize()
     if filter_by_location:
         filter_by_location = util.trim_string(filter_by_location, 20)
     return Embed(
         title=f":truck: TruckersMP | Highest Traffic Areas",
-        description=await get_description(filter_by_server,
-                                          filter_by_game,
-                                          filter_by_location,
-                                          players_in_locations=players_in_locations,
-                                          players_in_traffic=players_in_traffic),
+        description=get_description(filter_by_server,
+                                    filter_by_game,
+                                    filter_by_location,
+                                    players_in_locations=players_in_locations,
+                                    players_in_traffic=players_in_traffic),
         thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
         url="https://traffic.krashnz.com/",
         color=EMBED_COLOUR,
@@ -216,19 +219,19 @@ async def traffic_stats(locations: list, filter_by_server: str, filter_by_game: 
     )
 
 
-async def location_stats(locations: list, filter_by: str):
+def location_stats(locations: list, filter_by: str):
     matched_locations = []
     for location in locations:
         if location.name == filter_by:
             matched_locations.append(location)
 
-    description = await get_description()
+    description = get_description()
 
 
-async def player_stats(player: Player):
+def player_stats(player: Player):
     """Takes a specific player and creates an embed from them"""
     p = player
-    joined = await format.to_discord(await format.to_datetime(p.join_date))
+    joined = core.util.to_discord(core.util.to_datetime(p.join_date))
     steam = f"[{p.steam_id_64}](https://steamcommunity.com/profiles/{p.steam_id_64})"
     description = (
         f"> :pencil: **Name:** {p.name}\n"
@@ -241,7 +244,7 @@ async def player_stats(player: Player):
         vtc = f"[{p.vtc.name}](https://truckersmp.com/vtc/{p.vtc.id})"
         description += f"> :truck: **VTC:** {vtc}\n"
     if p.banned:
-        banned = await format.to_discord(await format.to_datetime(p.banned_until), "R")
+        banned = core.util.to_discord(core.util.to_datetime(p.banned_until), "R")
         description += f"> :hammer: **Unbanned:** {banned}\n"
     if p.permissions.is_game_admin:
         description += f"> :red_circle: **Player is an in-game admin!**\n"
@@ -260,10 +263,10 @@ async def player_stats(player: Player):
     )
 
 
-async def events_stats(events: list, list_name: str = "Events", max_size: int = 5):
+def events_stats(events: list, list_name: str = "Events", max_size: int = 5):
     fields = []
     for index, event in enumerate(events, 1):
-        fields.append(await embed_fields.get_event_field(event))
+        fields.append(embed_fields.get_event(event))
         if index == max_size:
             break
 
@@ -281,10 +284,10 @@ async def events_stats(events: list, list_name: str = "Events", max_size: int = 
     )
 
 
-async def event_stats(event: Event, avatar: str):
+def event_stats(event: Event, avatar: str):
     """Takes a specific event and creates an embed from them"""
     e = event
-    start_time = await format.to_discord(await format.to_datetime(e.start_at))
+    start_time = core.util.to_discord(core.util.to_datetime(e.start_at))
     if type(e.dlcs) is not dict:
         dlc_list_str = "None"
     else:
@@ -322,7 +325,7 @@ async def event_stats(event: Event, avatar: str):
     )
 
 
-async def bot_info(avatar_url, invite_link, privacy_policy, source_code):
+def bot_info(avatar_url, invite_link, privacy_policy, source_code):
     fields = [
         EmbedField(
             name="About",

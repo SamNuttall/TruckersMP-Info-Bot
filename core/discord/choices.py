@@ -1,17 +1,18 @@
-from interactions import Choice
-from difflib import SequenceMatcher
-from core.util import strip_dict_key_value
-from truckersmp.cache import Cache
+# Core; Discord: Choices
+# Handles choices which are part of an option in a command.
+# Functions here often return a list of choices to be presented to the user.
 
 # TODO: Look into reducing memory footprint of sim_score cache and it's viability.
 # Once values are cached, the time to add sim scores is reduced (~60% decrease).
 # Memory footprint of current implementation is very large though. Approx at sizes:
 # 52MB per 100k (520MB at 1M, 2.6GB at 5M - Original Maximum)
 
+from difflib import SequenceMatcher
 
-sim_score_cache = Cache(name="sim_score", max_size=200_000)
-server_choice_cache = Cache(name="server_choice", max_size=2000)
-location_choice_cache = Cache(name="location_choice", max_size=10000)
+from interactions import Choice
+
+from core.public import Caches
+from core.util import strip_dict_key_value
 
 
 def add_sim_score(list_of_dict: list, search: str, key: str):
@@ -31,11 +32,12 @@ def add_sim_score(list_of_dict: list, search: str, key: str):
             - contains: 1 if the search string is contained within the value
             * similarity marked by float between 0 & 1 (1 being most similar)
     """
+
     def get_ratio(a, b):
         return SequenceMatcher(None, a, b).ratio()
 
     def get_score(a, b):
-        return sim_score_cache.execute(get_ratio, None, a, b)
+        return Caches.sim_score.execute(get_ratio, None, a, b)
 
     for dictionary in list_of_dict:
         dictionary['sim_score'] = get_score(dictionary[key], search)
@@ -49,7 +51,7 @@ def add_sim_score(list_of_dict: list, search: str, key: str):
     )
 
 
-async def get_server_choices(servers: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.4):
+async def get_servers(servers: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.4):
     """
     Get a list of TruckersMP (traffic) servers to use as choices
 
@@ -96,10 +98,10 @@ async def get_server_choices(servers: list, search: str = "", maximum: int = 25,
     servers = to_dicts()
     server_names = strip_dict_key_value(servers, "name")
     key = (tuple(server_names), search, maximum, min_sim_score)
-    return server_choice_cache.execute(logic, key)
+    return Caches.server_choice.execute(logic, key)
 
 
-async def get_location_choices(locations: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.55):
+async def get_locations(locations: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.55):
     """
     Get a list of in-game locations to use as choices
 
@@ -140,10 +142,10 @@ async def get_location_choices(locations: list, search: str = "", maximum: int =
 
     location_names = strip_dict_key_value(locations, "name")
     key = (tuple(location_names), search, maximum, min_sim_score)
-    return location_choice_cache.execute(logic, key)
+    return Caches.location_choice.execute(logic, key)
 
 
-def get_game_choices():
+def get_games():
     """
     Gets the list of available games (hard-coded)
 
