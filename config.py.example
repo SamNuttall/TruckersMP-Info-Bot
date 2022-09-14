@@ -1,22 +1,27 @@
 # The following file is an example which works as the default config file.
 # Create a copy named config.py and edit options as suitable.
+# Options marked with * must be changed to ensure proper operation of the bot.
 
 # Provide a guild ID here to set commands to a single guild only. Otherwise, set to None.
 GUILD_ID = None
 
-# Provide a guild ID for debug/admin commands (eg. /cache).
-ADMIN_GUILD_ID = 0  # Change this!
+# Provide a guild ID for debug/admin commands (eg. /cache, /devinfo).
+ADMIN_GUILD_ID = 0  # *
+
+# Provide an owner ID (a user's Discord ID). This user can execute debug/admin commands.
+OWNER_ID = 0  # *
 
 # Whether responses to slash commands should be only be shown to the command author/instigator.
 EPHEMERAL_RESPONSES = False
 
-# Provide an owner ID (a user's Discord ID). This user can execute debug/admin commands.
-OWNER_ID = 0  # Change this!
-
 # Provide a channel ID for feedback to be sent too
-FEEDBACK_CHANNEL_ID = 0  # Change this!
+FEEDBACK_CHANNEL_ID = 0  # *
 
-BOT_AVATAR_URL = "https://example.com"  # Change this!
+# Provide information which will be used throughout the bot's interfaces.
+BOT_AVATAR_URL = "https://example.com"  # *
 BOT_INVITE_URL = "https://example.com"
 PRIVACY_POLICY_URL = "https://example.com"
 SOURCE_CODE_URL = "https://example.com"
+TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
+EMBED_COLOUR = 0x826b59
+EMBED_ERROR_COLOUR = 0xFF0000

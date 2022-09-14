@@ -5,20 +5,16 @@ from datetime import datetime
 from interactions import Embed, EmbedField, EmbedImageStruct, EmbedFooter
 from truckersmp.models import Player, Event
 
+import config
 import core.util
 from core import util
 from core.interface import field as embed_fields
 from core.models import Server
 
-TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
-BOT_AVATAR_URL = "https://i.imgur.com/pX5Q4zH.png"
-EMBED_COLOUR = 0x826b59
-EMBED_ERROR_COLOUR = 0xFF0000
-
 
 def generic_embed(title: str, colour=None):
     if colour is None:
-        colour = EMBED_ERROR_COLOUR
+        colour = config.EMBED_ERROR_COLOUR
     return Embed(
         title=title,
         color=colour
@@ -28,7 +24,7 @@ def generic_embed(title: str, colour=None):
 def item_not_found(item: str):
     return Embed(
         title=f":mag: {item} not found",
-        color=EMBED_ERROR_COLOUR
+        color=config.EMBED_ERROR_COLOUR
     )
 
 
@@ -41,7 +37,7 @@ def item_not_found_detailed(item, desc):
 def generic_error():
     return Embed(
         title=f":neutral_face: Something went wrong...",
-        color=EMBED_ERROR_COLOUR
+        color=config.EMBED_ERROR_COLOUR
     )
 
 
@@ -120,13 +116,13 @@ def servers_stats(servers: list, filter_by_game: str = None, ingame_time: str = 
                                     max_total_players=max_total_players,
                                     total_in_queue=total_in_queue,
                                     ingame_time=ingame_time),
-        thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
-        color=EMBED_COLOUR,
+        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
+        color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
         fields=fields,
         footer=EmbedFooter(
             text="Information provided by TruckersMP",
-            icon_url=BOT_AVATAR_URL
+            icon_url=config.BOT_AVATAR_URL
         )
     )
 
@@ -163,12 +159,12 @@ def server_stats(server: dict, ingame_time: str = None):
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
         description=description,
-        thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
-        color=EMBED_COLOUR,
+        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
+        color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
         footer=EmbedFooter(
             text="Information provided by TruckersMP",
-            icon_url=BOT_AVATAR_URL
+            icon_url=config.BOT_AVATAR_URL
         )
     )
 
@@ -207,14 +203,14 @@ def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
                                     filter_by_location,
                                     players_in_locations=players_in_locations,
                                     players_in_traffic=players_in_traffic),
-        thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
+        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
         url="https://traffic.krashnz.com/",
-        color=EMBED_COLOUR,
+        color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
         fields=fields,
         footer=EmbedFooter(
             text="Information provided by TruckyApp",
-            icon_url=BOT_AVATAR_URL
+            icon_url=config.BOT_AVATAR_URL
         )
     )
 
@@ -254,11 +250,11 @@ def player_stats(player: Player):
         url=f"https://truckersmp.com/user/{p.id}",
         description=description,
         thumbnail=EmbedImageStruct(url=p.avatar)._json,
-        color=EMBED_COLOUR,
+        color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
         footer=EmbedFooter(
             text="Information provided by TruckersMP",
-            icon_url=BOT_AVATAR_URL
+            icon_url=config.BOT_AVATAR_URL
         )
     )
 
@@ -273,13 +269,13 @@ def events_stats(events: list, list_name: str = "Events", max_size: int = 5):
     return Embed(
         title=f":truck: TruckersMP | {list_name}",
         url="https://truckersmp.com/events",
-        thumbnail=EmbedImageStruct(url=TRUCKERSMP_LOGO)._json,
-        color=EMBED_COLOUR,
+        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
+        color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
         fields=fields,
         footer=EmbedFooter(
             text="Information provided by TruckersMP",
-            icon_url=BOT_AVATAR_URL
+            icon_url=config.BOT_AVATAR_URL
         )
     )
 
@@ -316,11 +312,11 @@ def event_stats(event: Event, avatar: str):
         image=EmbedImageStruct(url=e.map),
         thumbnail=EmbedImageStruct(url=avatar)._json,
         description=description,
-        color=EMBED_COLOUR,
+        color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
         footer=EmbedFooter(
             text="Information provided by TruckersMP",
-            icon_url=BOT_AVATAR_URL
+            icon_url=config.BOT_AVATAR_URL
         )
     )
 
@@ -345,10 +341,10 @@ def bot_info(avatar_url, invite_link, privacy_policy, source_code):
     return Embed(
         title=":page_facing_up: Bot Information",
         fields=fields,
-        color=EMBED_COLOUR,
+        color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),
         footer=EmbedFooter(
             text="Developed with love by Sam#9210",
-            icon_url=BOT_AVATAR_URL
+            icon_url=config.BOT_AVATAR_URL
         )
     )
