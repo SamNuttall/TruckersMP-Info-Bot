@@ -260,7 +260,7 @@ def player_stats(player: Player):
     )
 
 
-def events_stats(events: list, list_name: str = "Events", max_size: int = 5):
+def events_stats(events: list, list_name: str = "Events", max_size: int = 3):
     fields = []
     for index, event in enumerate(events, 1):
         fields.append(embed_fields.get_event(event))
