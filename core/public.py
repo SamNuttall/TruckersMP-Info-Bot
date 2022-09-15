@@ -25,9 +25,9 @@ logging.basicConfig(filename="log.log",
 context_logger = get_logger("context")
 client_logger = get_logger("client")
 logger = get_logger("general")
-context_logger.setLevel(logging.WARNING)
-client_logger.setLevel(logging.WARNING)
-logger.setLevel(logging.DEBUG)
+context_logger.setLevel(config.CONTEXT_LOG_LVL)
+client_logger.setLevel(config.CLIENT_LOG_LVL)
+logger.setLevel(config.LOG_LVL)
 
 # Environment Variables
 load_dotenv()

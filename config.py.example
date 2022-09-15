@@ -2,6 +2,8 @@
 # Create a copy named config.py and edit options as suitable.
 # Options marked with * must be changed to ensure proper operation of the bot.
 
+import logging
+
 # Provide a guild ID here to set commands to a single guild only. Otherwise, set to None.
 GUILD_ID = None
 
@@ -25,3 +27,8 @@ SOURCE_CODE_URL = "https://example.com"
 TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 EMBED_COLOUR = 0x826b59
 EMBED_ERROR_COLOUR = 0xFF0000
+
+# Set the logging levels for each logger
+LOG_LVL = logging.DEBUG
+CONTEXT_LOG_LVL = logging.WARNING
+CLIENT_LOG_LVL = logging.WARNING
