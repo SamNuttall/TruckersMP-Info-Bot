@@ -60,6 +60,9 @@ class Limiters:
     steam_api = AsyncLimiter(20, 20)  # 20 requests / 20 secs (Steam API rate limit: 100K / day)
 
 
+# Persistence Configuration
+PERSISTENCE_KEY = getenv("PERSISTENCE_KEY")
+
 # Bot Configuration
 bot = Client(token=TOKEN,
              intents=interactions.Intents.GUILD_INTEGRATIONS,

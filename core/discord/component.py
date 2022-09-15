@@ -89,7 +89,7 @@ class SelectMenu:
             options.append(SelectOption(
                 label=event.name,
                 description=util.format_time(event.start_at, '%a, %d %B %Y'),
-                value=event.id
+                value=f"{event.id}#{list_type}"  # Value is ID & current list type, seperated by a hash
             ))
         return interactions.SelectMenu(
             custom_id=SelectMenu.EVENTS_SELECTOR,
