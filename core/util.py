@@ -69,7 +69,7 @@ def get_list_from_events(events, list_type: str = "Featured"):
         case "featured":
             events = events.featured
         case "upcoming":
-            events = events.upcoming
+            events = events.today + events.upcoming  # Upcoming should include todays event's too
         case _:
             events = events.now
     return events
