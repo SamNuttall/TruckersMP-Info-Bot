@@ -261,15 +261,19 @@ def player_stats(player: Player):
 
 
 def events_stats(events: list, list_name: str = "Events", max_size: int = 3):
+    desc = None
     fields = []
     for index, event in enumerate(events, 1):
         fields.append(embed_fields.get_event(event))
         if index == max_size:
             break
+    if len(fields) <= 0:
+        desc = ":slight_frown: No events found!"
 
     return Embed(
         title=f":truck: TruckersMP | {list_name}",
         url="https://truckersmp.com/events",
+        description=desc,
         thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
         color=config.EMBED_COLOUR,
         timestamp=str(datetime.utcnow()),

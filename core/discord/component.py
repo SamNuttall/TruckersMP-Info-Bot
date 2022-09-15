@@ -83,6 +83,8 @@ class SelectMenu:
             return SelectMenu._empty("Failed to load events.")
         options = list()
         events = util.get_list_from_events(events, list_type)
+        if len(events) <= 0:
+            return  # Don't display a selector if no events are given
         for event in events:
             options.append(SelectOption(
                 label=event.name,
