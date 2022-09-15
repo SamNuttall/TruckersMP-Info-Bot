@@ -8,8 +8,8 @@ from core.discord import choices
 from core.public import truckersmp
 
 
+@log.interaction("autocomplete")
 async def server(ctx, user_input: str):
-    log.interaction(ctx, "server", is_cmd=False)
     try:
         servers = await execute(truckersmp.get_servers)
     except exceptions.ExecuteError:
@@ -19,8 +19,8 @@ async def server(ctx, user_input: str):
     )
 
 
+@log.interaction("autocomplete")
 async def traffic(ctx, user_input: str):
-    log.interaction(ctx, "traffic", is_cmd=False)
     try:
         servers = await execute(data.get_traffic_servers)
         traffic_data = await execute(data.get_traffic, servers)
@@ -31,8 +31,8 @@ async def traffic(ctx, user_input: str):
     )
 
 
+@log.interaction("autocomplete")
 async def traffic_servers(ctx, user_input: str):
-    log.interaction(ctx, "traffic_servers", is_cmd=False)
     try:
         servers = await data.get_traffic_servers()
     except exceptions.ExecuteError:

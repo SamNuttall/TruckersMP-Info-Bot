@@ -3,6 +3,7 @@
 import interactions
 from interactions.ext.persistence import PersistentCustomID
 
+from core import log
 from core.public import bot, Caches
 
 import config
@@ -12,6 +13,7 @@ from core.interface import base as i
 
 class Button:
     @staticmethod
+    @log.interaction("button")
     async def event_back(ctx, list_type):
         await ctx.edit(
             embeds=await i.Events.overview(list_type),
@@ -24,6 +26,7 @@ class Button:
 
 class SelectMenu:
     @staticmethod
+    @log.interaction("selectMenu")
     async def events(ctx, value):
         list_type = value[0]
         components = interactions.spread_to_rows(
@@ -36,6 +39,7 @@ class SelectMenu:
         )
 
     @staticmethod
+    @log.interaction("selectMenu")
     async def events_selector(ctx, value):
         event_id, list_type = value[0].split('#')
         await ctx.edit(
@@ -55,6 +59,7 @@ class SelectMenu:
 
 class Modal:
     @staticmethod
+    @log.interaction("modal")
     async def feedback(ctx, subject, content):
         Caches.feedback.add(ctx.author.id, True)
         await ctx.send("Thanks for your feedback!", ephemeral=True)
