@@ -1,16 +1,16 @@
-# Main
-# Run this file to start the bot.
+"""
+Run this file to start the bot.
+"""
 
-from core.public import bot, PERSISTENCE_KEY
-from core import startup
+from common import startup_utils
+from common.const import bot
 
 
 def main():
-    if not startup.checks():
-        print("Failed startup checks; Check log file (log.log) for info")
+    if not startup_utils.is_configured_correctly():
+        print("Failed startup checks; Check log file for info!")
         quit(1)
-    bot.load("interactions.ext.persistence", cipher_key=PERSISTENCE_KEY)
-    startup.load_exts(bot)
+    startup_utils.load_exts(bot)
     bot.start()
 
 
