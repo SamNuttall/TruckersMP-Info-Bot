@@ -1,6 +1,7 @@
-# Core; Discord: Choices
-# Handles choices which are part of an option in a command.
-# Functions here often return a list of choices to be presented to the user.
+"""
+Handles choices which are part of an option in a command.
+Functions here often return a list of choices to be presented to the user.
+"""
 
 # TODO: Look into reducing memory footprint of sim_score cache and it's viability.
 # Once values are cached, the time to add sim scores is reduced (~60% decrease).
@@ -9,10 +10,10 @@
 
 from difflib import SequenceMatcher
 
-from interactions import Choice
+import interactions as ipy
 
-from core.public import Caches
-from core.util import strip_dict_key_value
+from common.const import Caches
+from common import utils
 
 
 def add_sim_score(list_of_dict: list, search: str, key: str):
@@ -89,14 +90,14 @@ async def get_servers(servers: list, search: str = "", maximum: int = 25, min_si
             identifier = 'id'
             if 'id' not in server:
                 identifier = 'url'
-            choice_list.append(Choice(
+            choice_list.append(ipy.SlashCommandChoice(
                 name=f"{server['name']} ({server['game'].upper()})",
                 value=server[identifier]
             ))
         return choice_list
 
     servers = to_dicts()
-    server_names = strip_dict_key_value(servers, "name")
+    server_names = utils.strip_dict_key_value(servers, "name")
     key = (tuple(server_names), search, maximum, min_sim_score)
     return Caches.server_choice.execute(logic, key)
 
@@ -133,14 +134,14 @@ async def get_locations(locations: list, search: str = "", maximum: int = 25, mi
             if len(choice_list) >= maximum:
                 break
             if location['name'] not in added_locations:
-                choice_list.append(Choice(
+                choice_list.append(ipy.SlashCommandChoice(
                     name=f"{location['name']} ({location['country']}) ({location['game']})",
                     value=location['name']
                 ))
                 added_locations.append(location['name'])
         return choice_list
 
-    location_names = strip_dict_key_value(locations, "name")
+    location_names = utils.strip_dict_key_value(locations, "name")
     key = (tuple(location_names), search, maximum, min_sim_score)
     return Caches.location_choice.execute(logic, key)
 
@@ -158,7 +159,7 @@ def get_games():
         'ATS': "American Truck Simulator"
     }
     for short_name, full_name in games.items():
-        choice_list.append(Choice(
+        choice_list.append(ipy.SlashCommandChoice(
             name=f"{full_name} ({short_name})",
             value=short_name
         ))

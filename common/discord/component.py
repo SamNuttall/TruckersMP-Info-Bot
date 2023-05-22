@@ -1,13 +1,13 @@
-# Core; Discord: Component
-# Stores and creates components used throughout the bot
+"""
+Stores components used throughout the bot such as menus, buttons and modals
+"""
 
-import interactions
-from interactions import Emoji, SelectOption
+import interactions as ipy
 from truckersmp import exceptions
 from truckersmp.base import execute
 
-from core import util
-from core.public import truckersmp
+from common import utils
+from common.const import truckersmp
 
 
 class Button:
@@ -22,15 +22,13 @@ class SelectMenu:
     @staticmethod
     def _empty(message: str):
         """Create an empty SelectMenu. Should really be used for error display only."""
-        return interactions.SelectMenu(
+        return ipy.StringSelectMenu(
+            ipy.StringSelectOption(
+                label=message,
+                value=SelectMenu.EMPTY
+            ),
             custom_id=SelectMenu.EMPTY,
             placeholder=message,
-            options=[
-                interactions.SelectOption(
-                    label=message,
-                    value=SelectMenu.EMPTY
-                )
-            ]
         )
 
     @staticmethod
@@ -40,19 +38,19 @@ class SelectMenu:
                 'label': "Featured",
                 'value': "featured",
                 'desc': "See events featured by TruckersMP",
-                'emoji': Emoji(name="⭐")
+                'emoji': ipy.PartialEmoji(name="⭐")
             },
             'upcoming': {
                 'label': "Upcoming",
                 'value': "upcoming",
                 'desc': "See events which are starting soonest",
-                'emoji': Emoji(name="📆")
+                'emoji': ipy.PartialEmoji(name="📆")
             },
             'now': {
                 'label': "Now",
                 'value': "now",
                 'desc': "See events which are happening now",
-                'emoji': Emoji(name="🚚")
+                'emoji': ipy.PartialEmoji(name="🚚")
             }
         }
 
@@ -62,17 +60,18 @@ class SelectMenu:
             data = option[1]
             is_default = title == default
             selectmenu_options.append(
-                SelectOption(label=data['label'],
-                             value=data['value'],
-                             description=data['desc'],
-                             emoji=data['emoji'],
-                             default=is_default
-                             )
+                ipy.StringSelectOption(
+                    label=data['label'],
+                    value=data['value'],
+                    description=data['desc'],
+                    emoji=data['emoji'],
+                    default=is_default
+                )
             )
 
-        return interactions.SelectMenu(
+        return ipy.StringSelectMenu(
+            *selectmenu_options,
             custom_id=SelectMenu.EVENTS,
-            options=selectmenu_options
         )
 
     @staticmethod
@@ -82,41 +81,37 @@ class SelectMenu:
         except exceptions.ExecuteError:
             return SelectMenu._empty("Failed to load events.")
         options = list()
-        events = util.get_list_from_events(events, list_type)
+        events = utils.get_list_from_events(events, list_type)
         if len(events) <= 0:
             return  # Don't display a selector if no events are given
         for event in events:
-            options.append(SelectOption(
+            options.append(ipy.StringSelectOption(
                 label=event.name,
-                description=util.format_time(event.start_at, '%a, %d %B %Y'),
+                description=utils.format_time(event.start_at, '%a, %d %B %Y'),
                 value=f"{event.id}#{list_type}"  # Value is ID & current list type, seperated by a hash
             ))
-        return interactions.SelectMenu(
+        return ipy.StringSelectMenu(
+            *options,
             custom_id=SelectMenu.EVENTS_SELECTOR,
-            options=options,
             placeholder="Select an event for details"
         )
 
 
 class Modal:
-    feedback = interactions.Modal(
+    feedback = ipy.Modal(
+        ipy.ShortText(
+            custom_id="subject_input",
+            label="Subject (optional)",
+            required=False,
+            max_length=50
+        ),
+        ipy.ParagraphText(
+            custom_id="content_input",
+            label="Give feedback, bug reports or comments here!",
+            required=True,
+            min_length=10,
+            max_length=3600  # Allow space for other information
+        ),
         custom_id="feedback_form",
-        title="Alfie Feedback Form",
-        components=[
-            interactions.TextInput(
-                custom_id="subject_input",
-                label="Subject (optional)",
-                style=interactions.TextStyleType.SHORT,
-                required=False,
-                max_length=50
-            ),
-            interactions.TextInput(
-                custom_id="content_input",
-                label="Give feedback, bug reports or comments here!",
-                style=interactions.TextStyleType.PARAGRAPH,
-                required=True,
-                min_length=10,
-                max_length=3600  # Allow space for other information
-            )
-        ]
+        title="Alfie Feedback Form"
     )
