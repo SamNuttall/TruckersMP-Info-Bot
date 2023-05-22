@@ -1,19 +1,23 @@
-# Core; Interface; Base
-# Gets embeds ready for the use in messages.
+"""
+Combines data and interface components by acting as a controller/middleperson
+In the end, most methods should return a message sendable (like an embed)
+"""
+import os
 
 from truckersmp import exceptions
 from truckersmp.base import execute
 
-from core import util, data
-from core.interface import embed
-from core.public import STEAM_KEY, truckersmp
+from common import utils
+from common.ui import embeds
+from common.const import truckersmp
+from common.data import retrieve as data
 
 
 class Servers:
     @staticmethod
     async def _get_base_data():
         servers = await execute(truckersmp.get_servers)
-        ingame_time = util.format_time(data.get_ingame_time())
+        ingame_time = utils.format_time(data.get_ingame_time())
         return servers, ingame_time
 
     @staticmethod
@@ -34,7 +38,7 @@ class Servers:
             servers, ingame_time = await Servers._get_base_data()
         except exceptions.ExecuteError:
             return embed.generic_error()
-        server = util.get_server_via_id(servers, server_id)
+        server = utils.get_server_via_id(servers, server_id)
         if server is None:
             return embed.item_not_found("Specified TruckersMP server")
         return embed.server_stats(
@@ -79,7 +83,7 @@ class Player:
         # Steam Vanity URL Search
         if player_name:
             try:
-                steam_id = await execute(data.get_steamid_via_vanityurl, STEAM_KEY, player_name)
+                steam_id = await execute(data.get_steamid_via_vanityurl, os.environ["STEAM_KEY"], player_name)
             except exceptions.ExecuteError:
                 return embed.generic_error()
             if steam_id is None:
@@ -115,7 +119,7 @@ class Events:
                 list_name = "Upcoming Events"
             case _:
                 list_name = "Events on Now"
-        events = util.get_list_from_events(events, list_type)
+        events = utils.get_list_from_events(events, list_type)
         return embed.events_stats(
             events=events,
             list_name=list_name
