@@ -43,6 +43,10 @@ def is_configured_correctly() -> bool:
     return is_passed
 
 
+def load_internal_exts(bot):
+    bot.load_extension('interactions.ext.sentry', token=os.environ['SENTRY_TOKEN'])
+
+
 def load_exts(bot) -> bool:
     """
     Automatically load extensions from the exts directory.

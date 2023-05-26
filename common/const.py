@@ -19,18 +19,29 @@ import config
 
 load_dotenv()
 
-# Setup Logging
-logger = logging.getLogger("alfie-bot")
-logger.setLevel(logging.DEBUG)
-# Log to file
-log_fh = logging.FileHandler("./log.log")
-log_fh.setLevel(logging.DEBUG)
+# Log to file handler
+log_fh = logging.FileHandler("./log.log", encoding="UTF-8")
 log_fh.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-logger.addHandler(log_fh)
-# Log to console
+
+# Log to console handler
 log_sh = logging.StreamHandler()
+
+# Setup logic logging
+logger = logging.getLogger("bot")
+logger.setLevel(logging.DEBUG)
+log_fh.setLevel(logging.DEBUG)
 log_sh.setLevel(logging.WARNING)
+logger.addHandler(log_fh)
 logger.addHandler(log_sh)
+
+# Setup ipy logging
+ipy_logger = logging.getLogger("ipy")
+ipy_logger.setLevel(logging.DEBUG)
+log_fh.setLevel(logging.INFO)
+log_sh.setLevel(logging.ERROR)
+ipy_logger.addHandler(log_fh)
+ipy_logger.addHandler(log_sh)
+
 
 truckersmp = TruckersMP(logger=logger)
 
@@ -39,7 +50,7 @@ bot = ipy.Client(
     intents=ipy.Intents.DEFAULT,
     debug_scope=config.ADMIN_GUILD_ID,
     activity=ipy.Activity.create(name="TruckersMP"),
-    logger=logger
+    logger=ipy_logger
 )
 ipyc.CLIENT_FEATURE_FLAGS["FOLLOWUP_INTERACTIONS_FOR_IMAGES"] = True  # TEMP FIX: See ipy issue #1414
 

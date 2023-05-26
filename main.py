@@ -10,6 +10,7 @@ def main():
     if not startup_utils.is_configured_correctly():
         print("Failed startup checks; Check log file for info!")
         quit(1)
+    startup_utils.load_internal_exts(bot)
     startup_utils.load_exts(bot)
     bot.start()
 
