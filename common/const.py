@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from truckersmp import TruckersMP
 from truckersmp.cache import Cache
 
+import config
 
 load_dotenv()
 
@@ -26,7 +27,7 @@ log_fh.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(mes
 logger.addHandler(log_fh)
 # Log to console
 log_sh = logging.StreamHandler()
-log_sh.setLevel(logging.DEBUG)
+log_sh.setLevel(logging.WARNING)
 logger.addHandler(log_sh)
 
 truckersmp = TruckersMP(logger=logger)
@@ -34,7 +35,7 @@ truckersmp = TruckersMP(logger=logger)
 bot = ipy.Client(
     token=os.environ["APP_TOKEN"],
     intents=ipy.Intents.DEFAULT,
-    debug_scope=ipy.MISSING,
+    debug_scope=config.ADMIN_GUILD_ID,
     activity=ipy.Activity.create(name="TruckersMP"),
     logger=logger
 )
