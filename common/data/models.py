@@ -6,7 +6,7 @@ Functions defined here aid the creation of models, often by adding more data.
 
 import re
 
-from core.interface.emoji import Emoji, TRAFFIC_SEVERITY
+from common.ui.emoji import Emoji, TRAFFIC_SEVERITY
 from common import utils
 
 
