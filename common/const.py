@@ -8,6 +8,8 @@ from datetime import timedelta
 import os
 
 import interactions as ipy
+from interactions.client import const as ipyc
+
 from aiolimiter import AsyncLimiter
 from dotenv import load_dotenv
 from truckersmp import TruckersMP
@@ -39,6 +41,7 @@ bot = ipy.Client(
     activity=ipy.Activity.create(name="TruckersMP"),
     logger=logger
 )
+ipyc.CLIENT_FEATURE_FLAGS["FOLLOWUP_INTERACTIONS_FOR_IMAGES"] = True  # TEMP FIX: See ipy issue #1414
 
 
 class Caches:  # Stores all caches, uses async-truckersmp implementation

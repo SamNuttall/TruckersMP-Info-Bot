@@ -11,13 +11,22 @@ from common.const import truckersmp
 
 
 class Button:
-    EVENT_BACK = "event-back-btn"
+    EVENT_BACK_ID = "event-back-btn"
+
+    @staticmethod
+    def get_event_back(list_name: str):
+        return ipy.Button(
+            style=ipy.ButtonStyle.SECONDARY,
+            label="Go Back to Overview",
+            emoji=ipy.PartialEmoji(name="🗓️"),
+            custom_id=Button.EVENT_BACK_ID+"#"+list_name
+        )
 
 
 class SelectMenu:
-    EMPTY = "empty_selectmenu"
-    EVENTS = "events_selectmenu"
-    EVENTS_SELECTOR = "events_selector_selectmenu"
+    EMPTY_ID = "empty_selectmenu"
+    EVENT_LISTS_ID = "event_lists_selectmenu"  # featured, upcoming, today
+    EVENTS_ID = "events_selectmenu"  # the list of events within an event list
 
     @staticmethod
     def _empty(message: str):
@@ -25,14 +34,16 @@ class SelectMenu:
         return ipy.StringSelectMenu(
             ipy.StringSelectOption(
                 label=message,
-                value=SelectMenu.EMPTY
+                value=SelectMenu.EMPTY_ID
             ),
-            custom_id=SelectMenu.EMPTY,
+            custom_id=SelectMenu.EMPTY_ID,
             placeholder=message,
         )
 
     @staticmethod
     def get_event_lists(default: str = "featured"):
+        if not default:
+            default = "featured"
         options = {
             'featured': {
                 'label': "Featured",
@@ -71,28 +82,30 @@ class SelectMenu:
 
         return ipy.StringSelectMenu(
             *selectmenu_options,
-            custom_id=SelectMenu.EVENTS,
+            custom_id=SelectMenu.EVENT_LISTS_ID,
         )
 
     @staticmethod
-    async def get_event_selector(list_type: str = "featured"):
+    async def get_events(list_name: str = "featured"):
+        if not list_name:
+            list_name = "featured"
         try:
             events = await execute(truckersmp.get_events)
         except exceptions.ExecuteError:
             return SelectMenu._empty("Failed to load events.")
         options = list()
-        events = utils.get_list_from_events(events, list_type)
+        events = utils.get_list_from_events(events, list_name)
         if len(events) <= 0:
             return  # Don't display a selector if no events are given
         for event in events:
             options.append(ipy.StringSelectOption(
                 label=event.name,
                 description=utils.format_time(event.start_at, '%a, %d %B %Y'),
-                value=f"{event.id}#{list_type}"  # Value is ID & current list type, seperated by a hash
+                value=f"{event.id}#{list_name}"  # Value is ID & current list type, seperated by a hash
             ))
         return ipy.StringSelectMenu(
             *options,
-            custom_id=SelectMenu.EVENTS_SELECTOR,
+            custom_id=SelectMenu.EVENTS_ID,
             placeholder="Select an event for details"
         )
 

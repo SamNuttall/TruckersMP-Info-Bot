@@ -50,7 +50,7 @@ def load_exts(bot) -> bool:
     Returns false if any extension failed to load
     """
     ext_paths = [  # list of strings containing paths to each extension
-        f"extensions.{f[:-3]}"
+        f"exts.{f[:-3]}"
         for f in os.listdir("./exts")
         if f.endswith(".py") and not f.startswith("_")
     ]
