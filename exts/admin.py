@@ -3,9 +3,11 @@ Extension for owner (private/admin) interactions
 """
 
 import interactions as ipy
+from interactions.ext.paginators import Paginator
 
 import config
 from common.discord import command as cmd
+from common.ui import embeds
 
 
 class AdminExtension(ipy.Extension):
@@ -18,4 +20,6 @@ class AdminExtension(ipy.Extension):
         if ctx.author.user.id != config.OWNER_ID:
             await ctx.send("You do not have permission to use this command.", ephemeral=True)
             return
-        # TODO: Implement new devinfo command (which combines /cache)
+
+        paginator = Paginator.create_from_embeds(self.bot, *embeds.dev_info(self.bot))
+        await paginator.send(ctx, ephemeral=True)

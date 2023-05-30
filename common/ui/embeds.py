@@ -5,6 +5,7 @@ Does not gather data - expects it to be passed
 
 import interactions as ipy
 from truckersmp.models import Player, Event
+from truckersmp.cache import get_caches
 
 import config
 from common import utils
@@ -352,3 +353,70 @@ def bot_info(avatar_url, invite_link, privacy_policy, source_code):
             icon_url=config.BOT_AVATAR_URL
         )
     )
+
+
+def dev_get_guilds(bot, max_length: int = 4000) -> list[str]:
+    guilds_descs = []  # creates an array with strings of guild lists, each up to the max_length ready for embed desc
+    zfill_length = len(str(len(bot.guilds)))  # Get number of guilds and get length of chars (e.g. 95 is 2 - 9 & 5 = 2)
+    guilds_txt_list = [
+        f"**{str(i).zfill(zfill_length)}**. {g.id} - {g.name} ({g.member_count})"
+        for i, g in enumerate(sorted(bot.guilds, key=lambda x: x.member_count, reverse=True), 1)
+    ]
+    guilds_txt = ""
+    for g in guilds_txt_list:
+        if len(guilds_txt) + len(g) > max_length:
+            guilds_descs.append(guilds_txt)
+            guilds_txt = ""
+        guilds_txt += g + "\n"
+    guilds_descs.append(guilds_txt)
+    return guilds_descs
+
+
+def dev_get_caches() -> list[ipy.EmbedField]:
+    fields = []
+    for cache in get_caches():
+        c = cache.get_info()
+        fields.append(
+            ipy.EmbedField(
+                name=c.name,
+                value=f"*Usage:* **{c.hits}** hits, **{c.misses}** ({c.expired_misses}) misses\n"
+                      f"*Size:* **{c.size}** / **{c.max_size}** items\n"
+                      f"*TTL:* {str(c.time_to_live)}",
+                inline=True
+            )
+        )
+    return fields
+
+
+def dev_info(bot) -> list[ipy.Embed]:
+    embeds = []
+    caches_txt = [
+        f"{c.name}:  |  {c.hits} / {c.misses} ({c.expired_misses})  |  "
+        f"{c.size} / {c.max_size}  |  {str(c.time_to_live)}"
+        for c in [c.get_info() for c in get_caches()]
+
+    ]
+    descriptions = ["", "", ]
+    fields = [  # of the first embed only
+        ipy.EmbedField(
+            name="Stats",
+            value=f"**Guild Count**: {len(bot.guilds)}\n"
+        )
+    ]
+    embeds_fields = [fields, dev_get_caches()]
+    descriptions += dev_get_guilds(bot)
+    for page, desc in enumerate(descriptions, 1):
+        embeds.append(
+            ipy.Embed(
+                title=f":robot: Dev Information - {'Overview' if page == 1 else 'Caches' if page == 2 else 'Guilds'}",
+                description=desc,
+                fields=embeds_fields[page-1] if page == 1 or page == 2 else [],
+                color=config.EMBED_COLOUR,
+                timestamp=ipy.Timestamp.utcnow(),
+                footer=ipy.EmbedFooter(
+                    text=f"Page {page} / {len(descriptions)}",
+                    icon_url=config.BOT_AVATAR_URL
+                )
+            )
+        )
+    return embeds
