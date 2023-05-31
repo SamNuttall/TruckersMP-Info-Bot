@@ -46,7 +46,7 @@ def is_configured_correctly() -> bool:
 
 
 def load_internal_exts(bot):
-    if 'SENTRY_TOKEN' in os.environ:
+    if 'SENTRY_TOKEN' in os.environ and os.environ['SENTRY_TOKEN'] != "":
         bot.load_extension('interactions.ext.sentry', token=os.environ['SENTRY_TOKEN'])
     else:
         logger.warning("Warning: Sentry logging not running as token has not been provided")

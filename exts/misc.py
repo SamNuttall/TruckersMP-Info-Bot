@@ -9,6 +9,7 @@ from common.const import Caches
 from common.discord import component
 from common.discord import command as cmd
 from common.ui import embeds
+from common.const import logger
 
 
 class MiscExtension(ipy.Extension):
@@ -50,3 +51,9 @@ class MiscExtension(ipy.Extension):
             f"**Subject:** {subject_input}\n"
             f"**Content:**\n{content_input}"
         )
+
+    @ipy.listen()
+    async def on_startup(self):
+        ready_string = f"Ready; Logged in as {self.bot.user.tag} (ID: {self.bot.user.id})"
+        logger.info(ready_string)
+        print(ready_string)

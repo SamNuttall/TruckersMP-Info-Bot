@@ -27,19 +27,20 @@
 <h2>Deployment</h2>
 <p>Using the official, hosted version of Alfie bot is the easiest, recommended and my preferred way for you to use the bot. Simply invite the bot to your server using the link in the overview.<br>However, if you still wish to deploy your own instance, please see the instructions below.</p>
  <ol>
-  <li>Ensure you are running Python 3.10 or later.</li>
+  <li>Ensure you are running Python 3.11 (Alfie is untested in other Python versions, but may still work).</li>
   <li>Set up a virtual environment using venv and install the dependencies.<br>To setup venv: <code>py -m venv venv</code> (See <a href="https://docs.python.org/3/library/venv.html">docs</a> for more)<br>Install dependencies: <code>pip install -U -r requirements.txt</code></li>
   <li>Rename <code>config.py.example</code> to <code>config.py</code> and modify where applicable.</li>
-  <li>Rename <code>.env.example</code> to <code>.env</code> and modify where applicable.<br>Get token from the <a href="https://discord.com/developers/applications">Discord Developer Portal</a>.<br>Get a Steam API key <a href="https://steamcommunity.com/dev/apikey">here</a>.<br>Run <code>persistence-generate-key</code> to get persistence key.</li>
+  <li>Rename <code>.env.example</code> to <code>.env</code> and modify where applicable.<br>Get token from the <a href="https://discord.com/developers/applications">Discord Developer Portal</a>.<br>Get a Steam API key <a href="https://steamcommunity.com/dev/apikey">here</a>.<br>Sentry support is optional, the variable can be left empty.</li>
   <li>Run the bot using <code>py main.py</code>.</li>
 </ol> 
 
 <h2>License</h2>
 <p>Released under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU GPL v3</a> license.</p>
-<p>This project makes use of the following packages, which are distributed under the GPL-3.0 and MIT Licenses:</p>
+<p>This project makes use of the following packages, which are distributed under the MIT & GPL-2.0 Licenses:</p>
 <ul>
-<li><a href="https://github.com/interactions-py/library">interactions.py</a> & <a href="https://github.com/interactions-py/persistence">interactions-persistence</a></li>
+<li><a href="https://github.com/interactions-py/library">interactions.py</a></li>
 <li><a href="https://github.com/mjpieters/aiolimiter">aiolimiter</a></li>
+<li><a href="https://github.com/seatgeek/thefuzz">TheFuzz</a></li>
 <li><a href="https://github.com/SamNuttall/Async-TruckersMP">Async-TruckersMP</a></li>
 </ul>
 
