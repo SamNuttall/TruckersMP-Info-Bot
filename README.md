@@ -1,5 +1,3 @@
-> :warning: **WIP version**: This version is work-in-progress and is prone to bugs, crashes or just may not work!
-
 <h1>Alfie - TruckersMP Info Discord Bot</h1>
 
 <h2>Overview</h2>
