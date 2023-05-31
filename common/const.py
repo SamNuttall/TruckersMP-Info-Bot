@@ -20,8 +20,8 @@ import config
 load_dotenv()
 
 # Log to file handler
-log_fh = logging.FileHandler("./log.log", encoding="UTF-8")
-log_fh.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+log_fh = logging.FileHandler(config.LOG_LOCATION, encoding="UTF-8")
+log_fh.setFormatter(config.LOG_FORMAT)
 
 # Log to console handler
 log_sh = logging.StreamHandler()
@@ -29,16 +29,16 @@ log_sh = logging.StreamHandler()
 # Setup logic logging
 logger = logging.getLogger("bot")
 logger.setLevel(logging.DEBUG)
-log_fh.setLevel(logging.DEBUG)
-log_sh.setLevel(logging.WARNING)
+log_fh.setLevel(config.BOT_LOG_LVL_FILE)
+log_sh.setLevel(config.BOT_LOG_LVL_CON)
 logger.addHandler(log_fh)
 logger.addHandler(log_sh)
 
 # Setup ipy logging
 ipy_logger = logging.getLogger("ipy")
 ipy_logger.setLevel(logging.DEBUG)
-log_fh.setLevel(logging.INFO)
-log_sh.setLevel(logging.ERROR)
+log_fh.setLevel(config.IPY_LOG_LVL_FILE)
+log_sh.setLevel(config.IPY_LOG_LVL_CON)
 ipy_logger.addHandler(log_fh)
 ipy_logger.addHandler(log_sh)
 
@@ -48,7 +48,7 @@ truckersmp = TruckersMP(logger=logger)
 bot = ipy.Client(
     token=os.environ["APP_TOKEN"],
     intents=ipy.Intents.DEFAULT,
-    debug_scope=config.ADMIN_GUILD_ID,
+    debug_scope=config.DEBUG_GUILD_ID,
     activity=ipy.Activity.create(name="TruckersMP"),
     logger=ipy_logger
 )

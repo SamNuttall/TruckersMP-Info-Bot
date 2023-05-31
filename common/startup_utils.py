@@ -31,9 +31,11 @@ def is_configured_correctly() -> bool:
         logger.critical(f"{log_start} Admin guild id (specified in the configuration file) is not an integer")
         is_passed = False
 
-    if (config.GUILD_ID is not None) and (config.GUILD_ID is not ipy.MISSING):
-        if type(config.GUILD_ID) is not int:
-            logger.critical(f"{log_start} Guild id (specified in the configuration file) is not an integer")
+    if config.DEBUG_GUILD_ID is not ipy.MISSING:
+        if type(config.DEBUG_GUILD_ID) is not int:
+            logger.critical(f"{log_start} Debug Guild id (specified in the configuration file) is not "
+                            f"an integer or ipy MISSING"
+                            )
             is_passed = False
 
     if type(config.EPHEMERAL_RESPONSES) is not bool:
@@ -44,7 +46,10 @@ def is_configured_correctly() -> bool:
 
 
 def load_internal_exts(bot):
-    bot.load_extension('interactions.ext.sentry', token=os.environ['SENTRY_TOKEN'])
+    if 'SENTRY_TOKEN' in os.environ:
+        bot.load_extension('interactions.ext.sentry', token=os.environ['SENTRY_TOKEN'])
+    else:
+        logger.warning("Warning: Sentry logging not running as token has not been provided")
 
 
 def load_exts(bot) -> bool:

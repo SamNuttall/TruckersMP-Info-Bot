@@ -44,7 +44,7 @@ class MiscExtension(ipy.Extension):
     async def feedback_modal_callback(self, ctx: ipy.ModalContext, subject_input, content_input):
         Caches.feedback.add(ctx.author.id, True)
         await ctx.send("Thanks for your feedback!", ephemeral=True)
-        channel = await self.bot.fetch_channel(809455958559686757)
+        channel = await self.bot.fetch_channel(config.FEEDBACK_CHANNEL_ID)
         await channel.send(
             f"**From:** {ctx.user.tag} ({ctx.user.id})\n"
             f"**Subject:** {subject_input}\n"

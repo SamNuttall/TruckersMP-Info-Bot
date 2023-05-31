@@ -83,7 +83,7 @@ class Player:
         # Steam Vanity URL Search
         if player_name:
             try:
-                steam_id = await execute(data.get_steamid_via_vanityurl, os.environ["STEAM_KEY"], player_name)
+                steam_id = await execute(data.get_steamid_via_vanityurl, os.environ["STEAM_API_KEY"], player_name)
             except exceptions.ExecuteError:
                 return embeds.generic_error()
             if steam_id is None:

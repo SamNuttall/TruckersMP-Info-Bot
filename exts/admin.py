@@ -17,7 +17,7 @@ class AdminExtension(ipy.Extension):
         description=cmd.Description.DEV_INFO
     )
     async def devinfo_cmd(self, ctx: ipy.InteractionContext):
-        if ctx.author.user.id != config.OWNER_ID:
+        if ctx.author.user.id not in config.OWNER_ID:
             await ctx.send("You do not have permission to use this command.", ephemeral=True)
             return
 
