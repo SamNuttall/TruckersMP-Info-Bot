@@ -170,10 +170,11 @@ def server_stats(server: dict, ingame_time: str = None):
     )
 
 
-def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
+def traffic_stats(locations: list, filter_by_server_data: list[str], filter_by_game: str,
                   filter_by_location: str, limit: int = 9):
     """Takes a list of traffic locations and creates an embed from them"""
     fields = []
+    filter_by_server, server_name = filter_by_server_data  # expects: backend server url, frontend server name
     filter_bys = (filter_by_server, filter_by_game, filter_by_location)
     players_in_locations = 0
     players_in_traffic = 0
@@ -199,7 +200,7 @@ def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
         filter_by_location = utils.trim_string(filter_by_location, 20)
     return ipy.Embed(
         title=f":truck: TruckersMP | Highest Traffic Areas",
-        description=get_description(filter_by_server,
+        description=get_description(server_name,
                                     filter_by_game,
                                     filter_by_location,
                                     players_in_locations=players_in_locations,

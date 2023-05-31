@@ -55,10 +55,17 @@ class Traffic:
             traffic = await execute(data.get_traffic, servers)
         except exceptions.ExecuteError:
             return embeds.generic_error()
+        if location:
+            if not any(i['name'] == location for i in traffic):
+                return embeds.item_not_found("Location")
+        if server:
+            if not any(i['url'] == server for i in servers):
+                return embeds.item_not_found("Server")
         return embeds.traffic_stats(
             locations=traffic,
             filter_by_location=location,
-            filter_by_server=server,
+            filter_by_server_data=[server, [i['name'] for i in servers if i['url'] == server][0]]
+            if server else [None, None],
             filter_by_game=game
         )
 
