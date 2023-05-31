@@ -1,17 +1,19 @@
-# Core: Data
-# Handles getting data required by the bot.
+"""
+Handles gathering of data from the web which cannot be retrieved via async-truckersmp
+Uses async-truckersmp utilities for aid (often for caching)
+"""
 
 import asyncio
 
 from datetime import datetime, timezone, timedelta
 from truckersmp import exceptions
 from truckersmp.base import wrapper
-from core.public import logger, Caches, Limiters
+from common.const import logger, Caches, Limiters
 
 TIMEOUT = 10  # secs
 
 
-async def get_traffic_servers():
+async def get_traffic_servers() -> list:
     """
     Gets a list of all TruckersMP traffic servers
 
@@ -31,7 +33,7 @@ async def get_traffic_servers():
         return servers
 
 
-async def get_traffic(traffic_servers: list):
+async def get_traffic(traffic_servers: list) -> list:
     """
     Gets a list of all traffic in each city, on each server, sorted by players
 
@@ -67,7 +69,7 @@ async def get_traffic(traffic_servers: list):
     return traffic
 
 
-def get_ingame_time():
+def get_ingame_time() -> datetime:
     """
     Gets the approximate in-game time (local, no API)
 
@@ -89,7 +91,7 @@ def get_ingame_time():
     return Caches.time.execute(logic)
 
 
-async def get_steamid_via_vanityurl(steam_key, vanity_url: str):
+async def get_steamid_via_vanityurl(steam_key, vanity_url: str) -> str:
     """
     Gets the SteamID of a user via their vanity_url
     """

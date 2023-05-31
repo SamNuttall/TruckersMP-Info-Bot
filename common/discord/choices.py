@@ -1,6 +1,7 @@
-# Core; Discord: Choices
-# Handles choices which are part of an option in a command.
-# Functions here often return a list of choices to be presented to the user.
+"""
+Handles choices which are part of an option in a command.
+Functions here often return a list of choices to be presented to the user.
+"""
 
 # TODO: Look into reducing memory footprint of sim_score cache and it's viability.
 # Once values are cached, the time to add sim scores is reduced (~60% decrease).
@@ -9,10 +10,30 @@
 
 from difflib import SequenceMatcher
 
-from interactions import Choice
+import interactions as ipy
+from thefuzz import fuzz
 
-from core.public import Caches
-from core.util import strip_dict_key_value
+from common.const import Caches
+from common import utils
+
+
+def add_sim_score_new(dict_list: list, search: str, key: str):
+    def get_score(v, sh):
+        v = v.lower()
+        sh = sh.lower()
+        s = 0
+        s += fuzz.token_sort_ratio(v.split('(')[0], sh) * 3  # Partial string: "city" | Weight: 0 - 300
+        s += 100 if len(sh) > 4 and sh in v else 0  # Value contains search | Weight: 0 or 100
+        s += 200 if v.startswith(sh) else 0  # Value starts with search | Weight: 0 or 200
+        return int((s / 600) * 100)  # max score: 500, brings score to 0 - 100
+
+    for dictionary in dict_list:
+        dictionary['sim_score'] = Caches.sim_score.execute(get_score, None, dictionary[key], search)
+
+    return sorted(
+        dict_list, key=lambda x: (x['sim_score']),
+        reverse=True
+    )
 
 
 def add_sim_score(list_of_dict: list, search: str, key: str):
@@ -51,7 +72,7 @@ def add_sim_score(list_of_dict: list, search: str, key: str):
     )
 
 
-async def get_servers(servers: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.4):
+async def get_servers(servers: list, search: str = "", maximum: int = 25, min_sim_score: int = 35):
     """
     Get a list of TruckersMP (traffic) servers to use as choices
 
@@ -77,31 +98,29 @@ async def get_servers(servers: list, search: str = "", maximum: int = 25, min_si
         choice_list = []
         s = servers
         if search != "":
-            s = add_sim_score(s, search, 'name')
+            s = add_sim_score_new(s, search, 'name')
         for server in s:
             valid_score = True
             if search != "":
-                valid_score = max(server['sim_score'],
-                                  server['trim_sim_score'],
-                                  server['first_sim_score']) >= min_sim_score or server['contains'] == 1
+                valid_score = server['sim_score'] >= min_sim_score
             if len(choice_list) >= maximum or not valid_score:
                 break
             identifier = 'id'
             if 'id' not in server:
                 identifier = 'url'
-            choice_list.append(Choice(
+            choice_list.append(ipy.SlashCommandChoice(
                 name=f"{server['name']} ({server['game'].upper()})",
                 value=server[identifier]
             ))
         return choice_list
 
     servers = to_dicts()
-    server_names = strip_dict_key_value(servers, "name")
+    server_names = utils.strip_dict_key_value(servers, "name")
     key = (tuple(server_names), search, maximum, min_sim_score)
     return Caches.server_choice.execute(logic, key)
 
 
-async def get_locations(locations: list, search: str = "", maximum: int = 25, min_sim_score: float = 0.55):
+async def get_locations(locations: list, search: str = "", maximum: int = 25, min_sim_score: int = 35):
     """
     Get a list of in-game locations to use as choices
 
@@ -119,28 +138,24 @@ async def get_locations(locations: list, search: str = "", maximum: int = 25, mi
         added_locations = []
         locs = locations
         if search != "":
-            locs = add_sim_score(locs, search, 'name')
+            locs = add_sim_score_new(locs, search, 'name')
         for location in locs:
             valid_score = True
             if search != "":
-                valid_score = max(location['sim_score'],
-                                  location['trim_sim_score'],
-                                  location['first_sim_score']) >= min_sim_score or (
-                                      location['contains'] == 1 or location['country'].lower() in search.lower()
-                              )
+                valid_score = location['sim_score'] >= min_sim_score
             if not valid_score:
                 continue
             if len(choice_list) >= maximum:
                 break
             if location['name'] not in added_locations:
-                choice_list.append(Choice(
+                choice_list.append(ipy.SlashCommandChoice(
                     name=f"{location['name']} ({location['country']}) ({location['game']})",
                     value=location['name']
                 ))
                 added_locations.append(location['name'])
         return choice_list
 
-    location_names = strip_dict_key_value(locations, "name")
+    location_names = utils.strip_dict_key_value(locations, "name")
     key = (tuple(location_names), search, maximum, min_sim_score)
     return Caches.location_choice.execute(logic, key)
 
@@ -158,7 +173,7 @@ def get_games():
         'ATS': "American Truck Simulator"
     }
     for short_name, full_name in games.items():
-        choice_list.append(Choice(
+        choice_list.append(ipy.SlashCommandChoice(
             name=f"{full_name} ({short_name})",
             value=short_name
         ))

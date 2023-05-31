@@ -1,9 +1,10 @@
-# Core; Discord: Command
-# Stores attributes used for commands.
+"""
+Stores attributes which are used for commands, such as decorators for slash options
+"""
 
-from interactions import Option, OptionType
+import interactions as ipy
 
-from core.discord import choices
+from common.discord import choices
 
 
 class Name:
@@ -49,15 +50,15 @@ class OptionDescription:
 
 class Options:
     SERVERS = [
-        Option(
-            type=OptionType.INTEGER,
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.INTEGER,
             name=OptionName.SERVER,
             description=OptionDescription.SERVER,
             required=False,
             autocomplete=True
         ),
-        Option(
-            type=OptionType.STRING,
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.STRING,
             name=OptionName.GAME,
             description=OptionDescription.GAME,
             required=False,
@@ -65,22 +66,22 @@ class Options:
         )
     ]
     TRAFFIC = [
-        Option(
-            type=OptionType.STRING,
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.STRING,
             name=OptionName.LOCATION,
             description=OptionDescription.LOCATION,
             required=False,
             autocomplete=True
         ),
-        Option(
-            type=OptionType.STRING,
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.STRING,
             name=OptionName.SERVER,
             description=OptionDescription.TRAFFIC_SERVER,
             required=False,
             autocomplete=True
         ),
-        Option(
-            type=OptionType.STRING,
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.STRING,
             name=OptionName.GAME,
             description=OptionDescription.TRAFFIC_GAME,
             required=False,
@@ -88,22 +89,22 @@ class Options:
         )
     ]
     PLAYER = [
-        Option(
-            type=OptionType.STRING,  # SteamID is too big for an integer
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.STRING,  # SteamID is too big for an integer
             name=OptionName.ID,
             description=OptionDescription.PLAYER_ID,
             required=False
         ),
-        Option(
-            type=OptionType.STRING,
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.STRING,
             name=OptionName.NAME,
             description=OptionDescription.PLAYER_NAME,
             required=False
         )
     ]
     EVENTS = [
-        Option(
-            type=OptionType.INTEGER,
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.INTEGER,
             name=OptionName.ID,
             description=OptionDescription.EVENT_ID,
             required=False
