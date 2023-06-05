@@ -50,7 +50,9 @@ bot = ipy.Client(
     intents=ipy.Intents.DEFAULT,
     debug_scope=config.DEBUG_GUILD_ID,
     activity=ipy.Activity.create(name="TruckersMP"),
-    logger=ipy_logger
+    logger=ipy_logger,
+    delete_unused_application_cmds=True
+    # auto_defer=True
 )
 ipyc.CLIENT_FEATURE_FLAGS["FOLLOWUP_INTERACTIONS_FOR_IMAGES"] = True  # TEMP FIX: See ipy issue #1414
 
