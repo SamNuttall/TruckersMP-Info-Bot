@@ -50,10 +50,9 @@ bot = ipy.Client(
     intents=ipy.Intents.DEFAULT,
     debug_scope=config.DEBUG_GUILD_ID,
     activity=ipy.Activity.create(name="TruckersMP"),
-    logger=ipy_logger
-    # auto_defer=True
+    logger=ipy_logger,
+    auto_defer=True
 )
-ipyc.CLIENT_FEATURE_FLAGS["FOLLOWUP_INTERACTIONS_FOR_IMAGES"] = True  # TEMP FIX: See ipy issue #1414
 
 
 class Caches:  # Stores all caches, uses async-truckersmp implementation
