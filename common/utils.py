@@ -6,9 +6,10 @@ from datetime import datetime
 from time import mktime
 from typing import Union
 
+import interactions as ipy
+
 import dateutil.parser
 from truckersmp.cache import get_caches
-
 
 INVISIBLE_CHAR = "ㅤ"
 
@@ -99,3 +100,7 @@ def get_list_from_events(events, list_type: str = "Featured"):
             events = events.now
     return events
 
+
+def is_component_author(ctx: ipy.ComponentContext):
+    """Check if a user using a component is the author of the component's original command"""
+    return ctx.author_id == ctx.message.interaction._user_id

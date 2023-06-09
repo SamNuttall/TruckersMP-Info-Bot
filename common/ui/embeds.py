@@ -41,10 +41,19 @@ def generic_error():
         color=config.EMBED_ERROR_COLOUR
     )
 
+
 def unhandled_error():
     return ipy.Embed(
         title=f":cry: An unexpected error occurred!",
         description="> *This has been logged and the bot owner has been notified.*",
+        color=config.EMBED_ERROR_COLOUR
+    )
+
+
+def cannot_use_component():
+    return ipy.Embed(
+        title=f":negative_squared_cross_mark: You cannot interact with this component!",
+        description="> *This component can only be used by the command author.\n> Try using the command yourself!*",
         color=config.EMBED_ERROR_COLOUR
     )
 
@@ -418,7 +427,7 @@ def dev_info(bot) -> list[ipy.Embed]:
             ipy.Embed(
                 title=f":robot: Dev Information - {'Overview' if page == 1 else 'Caches' if page == 2 else 'Guilds'}",
                 description=desc,
-                fields=embeds_fields[page-1] if page == 1 or page == 2 else [],
+                fields=embeds_fields[page - 1] if page == 1 or page == 2 else [],
                 color=config.EMBED_COLOUR,
                 timestamp=ipy.Timestamp.utcnow(),
                 footer=ipy.EmbedFooter(
