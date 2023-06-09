@@ -41,6 +41,13 @@ def generic_error():
         color=config.EMBED_ERROR_COLOUR
     )
 
+def unhandled_error():
+    return ipy.Embed(
+        title=f":cry: An unexpected error occurred!",
+        description="> *This has been logged and the bot owner has been notified.*",
+        color=config.EMBED_ERROR_COLOUR
+    )
+
 
 def format_fields(fields: list, expected_length: int = 9):
     """Add extra fields to display extra info and align content"""

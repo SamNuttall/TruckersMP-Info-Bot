@@ -48,10 +48,11 @@ truckersmp = TruckersMP(logger=logger)
 bot = ipy.Client(
     token=os.environ["APP_TOKEN"],
     intents=ipy.Intents.DEFAULT,
-    debug_scope=config.DEBUG_GUILD_ID,
     activity=ipy.Activity.create(name="TruckersMP"),
     logger=ipy_logger,
-    auto_defer=True
+    debug_scope=config.DEBUG_GUILD_ID,
+    auto_defer=True,
+    send_command_tracebacks=False
 )
 
 

@@ -24,3 +24,8 @@ class AdminExtension(ipy.Extension):
 
         paginator = Paginator.create_from_embeds(self.bot, *embeds.dev_info(self.bot))
         await paginator.send(ctx, ephemeral=True)
+
+    @ipy.listen(disable_default_listeners=True)
+    async def on_command_error(self, event: ipy.api.events.CommandError):
+        await event.ctx.send(embed=embeds.unhandled_error(), ephemeral=True)
+        await self.bot.on_command_error(self.bot, event)  # call default error handler
