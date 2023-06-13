@@ -366,7 +366,7 @@ def bot_info(avatar_url, invite_link, privacy_policy, source_code):
         color=config.EMBED_COLOUR,
         timestamp=ipy.Timestamp.utcnow(),
         footer=ipy.EmbedFooter(
-            text="Developed with love by Sam#9210",
+            text="Developed with love by samln",
             icon_url=config.BOT_AVATAR_URL
         )
     )
