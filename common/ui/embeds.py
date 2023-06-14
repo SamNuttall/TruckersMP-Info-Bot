@@ -376,7 +376,8 @@ def dev_get_guilds(bot, max_length: int = 4000) -> list[str]:
     guilds_descs = []  # creates an array with strings of guild lists, each up to the max_length ready for embed desc
     zfill_length = len(str(len(bot.guilds)))  # Get number of guilds and get length of chars (e.g. 95 is 2 - 9 & 5 = 2)
     guilds_txt_list = [
-        f"**{str(i).zfill(zfill_length)}**. {g.id} - {g.name} ({g.member_count})"
+        f"**{str(i).zfill(zfill_length)}.** `{g.name}` (:busts_in_silhouette: **{g.member_count}**)\n"
+        f"> :label: {g.id} | :door: {g.joined_at}"
         for i, g in enumerate(sorted(bot.guilds, key=lambda x: x.member_count, reverse=True), 1)
     ]
     guilds_txt = ""
@@ -396,9 +397,9 @@ def dev_get_caches() -> list[ipy.EmbedField]:
         fields.append(
             ipy.EmbedField(
                 name=c.name,
-                value=f"*Usage:* **{c.hits}** hits, **{c.misses}** ({c.expired_misses}) misses\n"
-                      f"*Size:* **{c.size}** / **{c.max_size}** items\n"
-                      f"*TTL:* {str(c.time_to_live)}",
+                value=f":mouse_three_button: `{c.hits}` hits, `{c.misses}` (`{c.expired_misses}`) misses\n"
+                      f":file_folder: `{c.size}` / `{c.max_size}` items\n"
+                      f":clock1: `{str(c.time_to_live)}`",
                 inline=True
             )
         )
@@ -407,17 +408,11 @@ def dev_get_caches() -> list[ipy.EmbedField]:
 
 def dev_info(bot) -> list[ipy.Embed]:
     embeds = []
-    caches_txt = [
-        f"{c.name}:  |  {c.hits} / {c.misses} ({c.expired_misses})  |  "
-        f"{c.size} / {c.max_size}  |  {str(c.time_to_live)}"
-        for c in [c.get_info() for c in get_caches()]
-
-    ]
     descriptions = ["", "", ]
     fields = [  # of the first embed only
         ipy.EmbedField(
             name="Stats",
-            value=f"**Guild Count**: {len(bot.guilds)}\n"
+            value=f":notepad_spiral: Guild Count: **{len(bot.guilds)}**\n"
         )
     ]
     embeds_fields = [fields, dev_get_caches()]
