@@ -1,34 +1,38 @@
 # The following file is an example which works as the default config file.
 # Create a copy named config.py and edit options as suitable.
-# Options marked with * must be changed to ensure proper operation of the bot.
 
 import logging
+from interactions import MISSING
 
-# Provide a guild ID here to set commands to a single guild only. Otherwise, set to None.
-GUILD_ID = None
+""" Admin
+    -----------------------------
+"""
+DEBUG_GUILD_ID = MISSING  # Provide a guild ID here to set commands to guild only. Otherwise, set to MISSING
+ADMIN_GUILD_ID = 409281778210308107  # Provide a guild ID for debug/admin commands (eg. /devinfo).
+OWNER_ID = [82058618211405824, ]  # Provide a list of owner IDs. These userscan execute debug/admin commands.
+FEEDBACK_CHANNEL_ID = 675754594575450128  # Provide a channel ID for feedback to be sent too
 
-# Provide a guild ID for debug/admin commands (eg. /cache, /devinfo).
-ADMIN_GUILD_ID = 0  # *
 
-# Provide an owner ID (a user's Discord ID). This user can execute debug/admin commands.
-OWNER_ID = 0  # *
+""" Logging
+    -----------------------------
+"""
+LOG_LOCATION = "./log.log"
+LOG_FORMAT = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+BOT_LOG_LVL_FILE = logging.INFO
+BOT_LOG_LVL_CON = logging.WARNING
+IPY_LOG_LVL_FILE = logging.INFO
+IPY_LOG_LVL_CON = logging.WARNING
 
-# Whether responses to slash commands should be only be shown to the command author/instigator.
-EPHEMERAL_RESPONSES = False
 
-# Provide a channel ID for feedback to be sent too
-FEEDBACK_CHANNEL_ID = 0  # *
-
-# Provide information which will be used throughout the bot's interfaces.
-BOT_AVATAR_URL = "https://example.com"  # *
-BOT_INVITE_URL = "https://example.com"
-PRIVACY_POLICY_URL = "https://example.com"
-SOURCE_CODE_URL = "https://example.com"
-TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
+""" Interface
+    -----------------------------
+"""
+EPHEMERAL_RESPONSES = False  # Whether responses to slash cmds should be only be shown to the command author/instigator
 EMBED_COLOUR = 0x826b59
 EMBED_ERROR_COLOUR = 0xFF0000
+BOT_AVATAR_URL = "https://i.imgur.com/pX5Q4zH.png"
+BOT_INVITE_URL = "https://discord.com/api/oauth2/authorize?client_id=937859809926074389&permissions=2147485696&scope=bot"
+PRIVACY_POLICY_URL = "https://gist.github.com/SamNuttall/14779a01ab50119949c87bc6b1a4b84d"
+SOURCE_CODE_URL = "https://github.com/SamNuttall/TruckersMP-Info-Bot"
+TRUCKERSMP_LOGO = "https://truckersmp.com/assets/img/avatar.png"
 
-# Set the logging levels for each logger
-LOG_LVL = logging.DEBUG
-CONTEXT_LOG_LVL = logging.WARNING
-CLIENT_LOG_LVL = logging.WARNING

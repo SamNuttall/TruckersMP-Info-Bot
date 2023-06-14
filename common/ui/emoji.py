@@ -1,5 +1,7 @@
-# Core; Interface: Emoji
-# Handles Discord emoji used by the bot in it's messages.
+"""
+The bot heavily makes use of Emoji.
+This file stores custom emoji and logic used in messages.
+"""
 
 # TODO: Implement use_exclusive false mode
 # This will cause the bot not use the custom emojis.
@@ -29,7 +31,7 @@ class Emoji:
     T_HEV = "<:Heavy_Traffic:856988618340958208>"
 
 
-def as_dict(emoji: str):
+def as_dict(emoji: str) -> dict:
     """Converts an Emoji into a dictionary"""
     name, emoji_id = emoji[2:-1].split(":")
     return {'name': name, 'id': emoji_id}

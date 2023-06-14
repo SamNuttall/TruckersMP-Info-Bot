@@ -1,12 +1,13 @@
-# Core: Models
-# Defines classes to create a model of what we expect an API to return.
-# Models here are only for non async-truckersmp related objects or to aid the visualisation of data.
-# Functions defined here aid the creation of models, often by adding more data.
+"""
+Defines classes to create a data model of what we expect an API to return.
+Models here are only for non async-truckersmp related objects or to aid the visualisation of data.
+Functions defined here aid the creation of models, often by adding more data.
+"""
 
 import re
 
-from core import util
-from core.interface.emoji import Emoji, TRAFFIC_SEVERITY
+from common.ui.emoji import Emoji, TRAFFIC_SEVERITY
+from common import utils
 
 
 class TrafficServerAttributes:
@@ -78,7 +79,6 @@ class TrafficServer:
 
 class Server:
     """Add format attributes of a specific server ready for use in embeds"""
-
     def __init__(self, server,
                  online_str="Online",
                  offline_str="Offline",
@@ -100,7 +100,7 @@ class Server:
 
         self.formatted_name = self.short_name
         if self.is_event:
-            self.formatted_name = util.trim_string(self.name)
+            self.formatted_name = utils.trim_string(self.name)
 
         self.current_players = server.players
         self.max_players = server.max_players
@@ -129,11 +129,10 @@ class Server:
 
 
 class Location:
-
     def __init__(self, location):
         self.server = location[LocationAttributes.server]
         self.name = location[LocationAttributes.name]
-        self.trimmed_name = util.trim_string(self.name, 17)
+        self.trimmed_name = utils.trim_string(self.name, 17)
         self.game = location[LocationAttributes.game].upper()
         self.game_emoji = Emoji.ETS2 if self.game == "ETS2" else Emoji.ATS
         self.players = location[LocationAttributes.players]
@@ -143,9 +142,9 @@ class Location:
         self.severity_bar = TRAFFIC_SEVERITY[self.severity][1]
 
         self.server_name = self.server[TrafficServerAttributes.name]
-        self.trimmed_server_name = util.trim_string(self.server_name, 12)
+        self.trimmed_server_name = utils.trim_string(self.server_name, 12)
         self.server_short_name = self.server[TrafficServerAttributes.short_name]
 
         self.server_formatted_name = self.server_short_name
         if "event" in self.server[TrafficServerAttributes.url]:
-            self.server_formatted_name = util.trim_string(self.server_name, 9)
+            self.server_formatted_name = utils.trim_string(self.server_name, 9)

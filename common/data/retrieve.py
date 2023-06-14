@@ -1,17 +1,23 @@
-# Core: Data
-# Handles getting data required by the bot.
+"""
+Handles gathering of data from the web which cannot be retrieved via async-truckersmp
+Uses async-truckersmp utilities for aid (often for caching)
+"""
 
 import asyncio
 
 from datetime import datetime, timezone, timedelta
+from math import floor
+
 from truckersmp import exceptions
 from truckersmp.base import wrapper
-from core.public import logger, Caches, Limiters
+
+from common import utils
+from common.const import logger, Caches, Limiters, truckersmp
 
 TIMEOUT = 10  # secs
 
 
-async def get_traffic_servers():
+async def get_traffic_servers() -> list:
     """
     Gets a list of all TruckersMP traffic servers
 
@@ -31,7 +37,7 @@ async def get_traffic_servers():
         return servers
 
 
-async def get_traffic(traffic_servers: list):
+async def get_traffic(traffic_servers: list) -> list:
     """
     Gets a list of all traffic in each city, on each server, sorted by players
 
@@ -67,29 +73,48 @@ async def get_traffic(traffic_servers: list):
     return traffic
 
 
-def get_ingame_time():
+async def sync_time():
     """
-    Gets the approximate in-game time (local, no API)
+    Sync the API ingame-time for use locally.
+    Returns a dictionary with the value from the API (val: int) and when it was fetched (at: int)
+    Will return None if the call fails, in which case fallback values should be used.
+    """
+    try:
+        api_time = await truckersmp.get_ingame_time()
+    except exceptions.FormatError:
+        return
+    else:
+        game_time = {
+            'val': api_time,
+            'at': round(datetime.utcnow().timestamp())  # unix
+        }
+        return game_time
+
+
+def get_ingame_time(synced_time: dict = None) -> datetime:
+    """
+    Gets the approximate in-game time using the synced time
 
     Returns:
-        datetime = The approximate in-game time (only hour & min mostly important)
+        datetime = The approximate in-game time (only hour & min)
     """
     def logic():
-        epoch = datetime(2015, 10, 25, 15, 48, 32, tzinfo=timezone.utc)  # From TruckersMP API docs
-        offset = timedelta(minutes=48, hours=15)  # This appears to align regardless of docs; Reason unknown
-        time_now = datetime.now(timezone.utc)
+        game_time = synced_time
+        if game_time is None:
+            game_time = {'val': 24150266, 'at': 1686732595}  # fallback to tested values
 
-        since_epoch = time_now - epoch
-        ingame_mins_since_epoch = timedelta(
-            seconds=since_epoch.total_seconds() * 6)  # 10 real sec = 60 in-game sec (x*6)
-        game_time = epoch + ingame_mins_since_epoch + offset
+        now = round(datetime.utcnow().timestamp())
+        calc_time = game_time['val'] + ((now - game_time['at']) / 10)  # calc diff in time between now and last sync
+        display_time = (calc_time - 2) * 60  # -2 to account for visual difference (not sure on the reason)
+        hours = (display_time / 3600) % 24
+        mins = (display_time / 60) % 60
 
-        return game_time
+        return datetime.strptime(f"{floor(hours)}:{floor(mins)}", "%H:%M")
 
     return Caches.time.execute(logic)
 
 
-async def get_steamid_via_vanityurl(steam_key, vanity_url: str):
+async def get_steamid_via_vanityurl(steam_key, vanity_url: str) -> str:
     """
     Gets the SteamID of a user via their vanity_url
     """

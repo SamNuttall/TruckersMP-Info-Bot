@@ -1,17 +1,18 @@
-# Core; Interface: Fields
-# Handles the creation of embed fields.
-# Functions here will return an EmbedField created based on the data given.
+"""
+Handles the creation of embed fields (often those that are used in mass and follow a similar structure)
+Functions here will return an EmbedField created based on the data given.
+"""
 
-from interactions import EmbedField
+import interactions as ipy
 
-import core.util
-from core.models import Server, Location
-from core.util import INVISIBLE_CHAR
+from common import utils
+from common.data.models import Server, Location
+from common.utils import INVISIBLE_CHAR  # TODO: Review the location of this (invisible char)
 
 
 def get_server(server):
     s = Server(server)
-    return EmbedField(
+    return ipy.EmbedField(
         name=f"{s.status_emoji}{s.game_emoji} {s.formatted_name}",
         value=f"**{s.status}:** {s.players}\n**In queue:** {s.queue}\n{' '.join(s.icons)}",
         inline=True,
@@ -20,7 +21,7 @@ def get_server(server):
 
 def get_location(location: dict):
     lo = Location(location)
-    return EmbedField(
+    return ipy.EmbedField(
         name=lo.trimmed_name,
         value=f"{lo.game_emoji} **{lo.trimmed_server_name}\n"
               f"Players:** {lo.players} {INVISIBLE_CHAR}\n{lo.severity_bar}",
@@ -30,8 +31,8 @@ def get_location(location: dict):
 
 def get_event(event):
     e = event
-    start_time = core.util.to_discord(core.util.to_datetime(event.start_at))
-    return EmbedField(
+    start_time = utils.datetime_to_discord_str(utils.iso_to_datetime(event.start_at))
+    return ipy.EmbedField(
         name=event.name,
         value=(
             f":round_pushpin: {e.departure.location}, {e.departure.city}\n"

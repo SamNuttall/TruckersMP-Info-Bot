@@ -1,29 +1,29 @@
-# Core; Interface: Embed
-# Gathers data and creates embeds from it.
+"""
+Creates embeds ready to be sent in Discord
+Does not gather data - expects it to be passed
+"""
 
-from datetime import datetime
-
-from interactions import Embed, EmbedField, EmbedImageStruct, EmbedFooter
+import interactions as ipy
 from truckersmp.models import Player, Event
+from truckersmp.cache import get_caches
 
 import config
-import core.util
-from core import util
-from core.interface import field as embed_fields
-from core.models import Server
+from common import utils
+from common.ui import field as embed_fields
+from common.data.models import Server
 
 
 def generic_embed(title: str, colour=None):
     if colour is None:
         colour = config.EMBED_ERROR_COLOUR
-    return Embed(
+    return ipy.Embed(
         title=title,
         color=colour
     )
 
 
 def item_not_found(item: str):
-    return Embed(
+    return ipy.Embed(
         title=f":mag: {item} not found",
         color=config.EMBED_ERROR_COLOUR
     )
@@ -36,8 +36,24 @@ def item_not_found_detailed(item, desc):
 
 
 def generic_error():
-    return Embed(
+    return ipy.Embed(
         title=f":neutral_face: Something went wrong...",
+        color=config.EMBED_ERROR_COLOUR
+    )
+
+
+def unhandled_error():
+    return ipy.Embed(
+        title=f":cry: An unexpected error occurred!",
+        description="> *This has been logged and the bot owner has been notified.*",
+        color=config.EMBED_ERROR_COLOUR
+    )
+
+
+def cannot_use_component():
+    return ipy.Embed(
+        title=f":negative_squared_cross_mark: You cannot interact with this component!",
+        description="> *This component can only be used by the command author.\n> Try using the command yourself!*",
         color=config.EMBED_ERROR_COLOUR
     )
 
@@ -46,19 +62,19 @@ def format_fields(fields: list, expected_length: int = 9):
     """Add extra fields to display extra info and align content"""
     input_len = len(fields)
     if len(fields) % 3 == 2:
-        fields.append(EmbedField(
+        fields.append(ipy.EmbedField(
             name=f"⠀",
             value=f"⠀",
             inline=True
         ))
     if input_len == 0:
-        fields.append(EmbedField(
+        fields.append(ipy.EmbedField(
             name="No Results!",
             value=f"**:cry: All locations have no players.**",
             inline=False,
         ))
     elif input_len < expected_length:
-        fields.append(EmbedField(
+        fields.append(ipy.EmbedField(
             name="⠀",
             value=f"*:cry: Showing {input_len} locations; all others have no players.*",
             inline=False,
@@ -109,7 +125,7 @@ def servers_stats(servers: list, filter_by_game: str = None, ingame_time: str = 
     fields = format_fields(fields, 0)
     if not ingame_time:
         ingame_time = "Unknown"
-    return Embed(
+    return ipy.Embed(
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
         description=get_description(filter_by_game=filter_by_game,
@@ -117,11 +133,11 @@ def servers_stats(servers: list, filter_by_game: str = None, ingame_time: str = 
                                     max_total_players=max_total_players,
                                     total_in_queue=total_in_queue,
                                     ingame_time=ingame_time),
-        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
+        thumbnail=ipy.EmbedAttachment(url=config.TRUCKERSMP_LOGO),
         color=config.EMBED_COLOUR,
-        timestamp=str(datetime.utcnow()),
+        timestamp=ipy.Timestamp.utcnow(),
         fields=fields,
-        footer=EmbedFooter(
+        footer=ipy.EmbedFooter(
             text="Information provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
@@ -156,24 +172,25 @@ def server_stats(server: dict, ingame_time: str = None):
         f"> {s.promods_icon} {promods}"
         f"\n> :label: **Type:** {s.type}"
     )
-    return Embed(
+    return ipy.Embed(
         title=f":truck: TruckersMP | Server Stats",
         url="https://truckersmp.com/status",
         description=description,
-        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
+        thumbnail=ipy.EmbedAttachment(url=config.TRUCKERSMP_LOGO),
         color=config.EMBED_COLOUR,
-        timestamp=str(datetime.utcnow()),
-        footer=EmbedFooter(
+        timestamp=ipy.Timestamp.utcnow(),
+        footer=ipy.EmbedFooter(
             text="Information provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
     )
 
 
-def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
+def traffic_stats(locations: list, filter_by_server_data: list[str], filter_by_game: str,
                   filter_by_location: str, limit: int = 9):
     """Takes a list of traffic locations and creates an embed from them"""
     fields = []
+    filter_by_server, server_name = filter_by_server_data  # expects: backend server url, frontend server name
     filter_bys = (filter_by_server, filter_by_game, filter_by_location)
     players_in_locations = 0
     players_in_traffic = 0
@@ -196,20 +213,20 @@ def traffic_stats(locations: list, filter_by_server: str, filter_by_game: str,
     if filter_by_server:
         filter_by_server = filter_by_server.capitalize()
     if filter_by_location:
-        filter_by_location = util.trim_string(filter_by_location, 20)
-    return Embed(
+        filter_by_location = utils.trim_string(filter_by_location, 20)
+    return ipy.Embed(
         title=f":truck: TruckersMP | Highest Traffic Areas",
-        description=get_description(filter_by_server,
+        description=get_description(server_name,
                                     filter_by_game,
                                     filter_by_location,
                                     players_in_locations=players_in_locations,
                                     players_in_traffic=players_in_traffic),
-        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
+        thumbnail=ipy.EmbedAttachment(url=config.TRUCKERSMP_LOGO),
         url="https://traffic.krashnz.com/",
         color=config.EMBED_COLOUR,
-        timestamp=str(datetime.utcnow()),
+        timestamp=ipy.Timestamp.utcnow(),
         fields=fields,
-        footer=EmbedFooter(
+        footer=ipy.EmbedFooter(
             text="Information provided by TruckyApp",
             icon_url=config.BOT_AVATAR_URL
         )
@@ -228,7 +245,7 @@ def location_stats(locations: list, filter_by: str):
 def player_stats(player: Player):
     """Takes a specific player and creates an embed from them"""
     p = player
-    joined = core.util.to_discord(core.util.to_datetime(p.join_date))
+    joined = utils.datetime_to_discord_str(utils.iso_to_datetime(p.join_date))
     steam = f"[{p.steam_id_64}](https://steamcommunity.com/profiles/{p.steam_id_64})"
     description = (
         f"> :pencil: **Name:** {p.name}\n"
@@ -241,19 +258,19 @@ def player_stats(player: Player):
         vtc = f"[{p.vtc.name}](https://truckersmp.com/vtc/{p.vtc.id})"
         description += f"> :truck: **VTC:** {vtc}\n"
     if p.banned:
-        banned = core.util.to_discord(core.util.to_datetime(p.banned_until), "R")
+        banned = utils.datetime_to_discord_str(utils.iso_to_datetime(p.banned_until), "R")
         description += f"> :hammer: **Unbanned:** {banned}\n"
     if p.permissions.is_game_admin:
         description += f"> :red_circle: **Player is an in-game admin!**\n"
         description += f"> :black_circle: **Role:** {p.group_name}\n"
-    return Embed(
+    return ipy.Embed(
         title=f":bust_in_silhouette: TruckersMP | Player Information",
         url=f"https://truckersmp.com/user/{p.id}",
         description=description,
-        thumbnail=EmbedImageStruct(url=p.avatar)._json,
+        thumbnail=ipy.EmbedAttachment(url=p.avatar),
         color=config.EMBED_COLOUR,
-        timestamp=str(datetime.utcnow()),
-        footer=EmbedFooter(
+        timestamp=ipy.Timestamp.utcnow(),
+        footer=ipy.EmbedFooter(
             text="Information provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
@@ -270,15 +287,15 @@ def events_stats(events: list, list_name: str = "Events", max_size: int = 3):
     if len(fields) <= 0:
         desc = ":slight_frown: No events found!"
 
-    return Embed(
+    return ipy.Embed(
         title=f":truck: TruckersMP | {list_name}",
         url="https://truckersmp.com/events",
         description=desc,
-        thumbnail=EmbedImageStruct(url=config.TRUCKERSMP_LOGO)._json,
+        thumbnail=ipy.EmbedAttachment(url=config.TRUCKERSMP_LOGO),
         color=config.EMBED_COLOUR,
-        timestamp=str(datetime.utcnow()),
+        timestamp=ipy.Timestamp.utcnow(),
         fields=fields,
-        footer=EmbedFooter(
+        footer=ipy.EmbedFooter(
             text="Information provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
@@ -288,7 +305,7 @@ def events_stats(events: list, list_name: str = "Events", max_size: int = 3):
 def event_stats(event: Event, avatar: str):
     """Takes a specific event and creates an embed from them"""
     e = event
-    start_time = core.util.to_discord(core.util.to_datetime(e.start_at))
+    start_time = utils.datetime_to_discord_str(utils.iso_to_datetime(e.start_at))
     if type(e.dlcs) is not dict:
         dlc_list_str = "None"
     else:
@@ -311,15 +328,15 @@ def event_stats(event: Event, avatar: str):
         f":bust_in_silhouette: **Creator:** [{e.user.username}](https://truckersmp.com/user/{e.user.id})"
     )
 
-    return Embed(
+    return ipy.Embed(
         title=f"{e.name}",
         url=f"https://truckersmp.com/events/{e.id}",
-        image=EmbedImageStruct(url=e.map),
-        thumbnail=EmbedImageStruct(url=avatar)._json,
+        images=[ipy.EmbedAttachment(url=e.map)],
+        thumbnail=ipy.EmbedAttachment(url=avatar),
         description=description,
         color=config.EMBED_COLOUR,
-        timestamp=str(datetime.utcnow()),
-        footer=EmbedFooter(
+        timestamp=ipy.Timestamp.utcnow(),
+        footer=ipy.EmbedFooter(
             text="Information provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
@@ -328,28 +345,90 @@ def event_stats(event: Event, avatar: str):
 
 def bot_info(avatar_url, invite_link, privacy_policy, source_code):
     fields = [
-        EmbedField(
+        ipy.EmbedField(
             name="About",
             value=f"Hi, I'm Alfie! :wave:\nA small companion for TruckersMP stats.\nThanks for using me :)"
         ),
-        EmbedField(
+        ipy.EmbedField(
             name="Commands",
             value=f"I fully support slash commands!\nType **/** in chat for more"
         ),
-        EmbedField(
+        ipy.EmbedField(
             name="Useful Links",
             value=f":robot: [Invite]({invite_link}) | "
                   f":shield: [Privacy Policy]({privacy_policy}) | "
                   f":mag: [Source Code]({source_code})"
         )
     ]
-    return Embed(
+    return ipy.Embed(
         title=":page_facing_up: Bot Information",
         fields=fields,
         color=config.EMBED_COLOUR,
-        timestamp=str(datetime.utcnow()),
-        footer=EmbedFooter(
-            text="Developed with love by Sam#9210",
+        timestamp=ipy.Timestamp.utcnow(),
+        footer=ipy.EmbedFooter(
+            text="Developed with love by samln",
             icon_url=config.BOT_AVATAR_URL
         )
     )
+
+
+def dev_get_guilds(bot, max_length: int = 4000) -> list[str]:
+    guilds_descs = []  # creates an array with strings of guild lists, each up to the max_length ready for embed desc
+    zfill_length = len(str(len(bot.guilds)))  # Get number of guilds and get length of chars (e.g. 95 is 2 - 9 & 5 = 2)
+    guilds_txt_list = [
+        f"**{str(i).zfill(zfill_length)}.** `{g.name}` (:busts_in_silhouette: **{g.member_count}**)\n"
+        f"> :label: {g.id} | :door: {g.joined_at}"
+        for i, g in enumerate(sorted(bot.guilds, key=lambda x: x.member_count, reverse=True), 1)
+    ]
+    guilds_txt = ""
+    for g in guilds_txt_list:
+        if len(guilds_txt) + len(g) > max_length:
+            guilds_descs.append(guilds_txt)
+            guilds_txt = ""
+        guilds_txt += g + "\n"
+    guilds_descs.append(guilds_txt)
+    return guilds_descs
+
+
+def dev_get_caches() -> list[ipy.EmbedField]:
+    fields = []
+    for cache in get_caches():
+        c = cache.get_info()
+        fields.append(
+            ipy.EmbedField(
+                name=c.name,
+                value=f":mouse_three_button: `{c.hits}` hits, `{c.misses}` (`{c.expired_misses}`) misses\n"
+                      f":file_folder: `{c.size}` / `{c.max_size}` items\n"
+                      f":clock1: `{str(c.time_to_live)}`",
+                inline=True
+            )
+        )
+    return fields
+
+
+def dev_info(bot) -> list[ipy.Embed]:
+    embeds = []
+    descriptions = ["", "", ]
+    fields = [  # of the first embed only
+        ipy.EmbedField(
+            name="Stats",
+            value=f":notepad_spiral: Guild Count: **{len(bot.guilds)}**\n"
+        )
+    ]
+    embeds_fields = [fields, dev_get_caches()]
+    descriptions += dev_get_guilds(bot)
+    for page, desc in enumerate(descriptions, 1):
+        embeds.append(
+            ipy.Embed(
+                title=f":robot: Dev Information - {'Overview' if page == 1 else 'Caches' if page == 2 else 'Guilds'}",
+                description=desc,
+                fields=embeds_fields[page - 1] if page == 1 or page == 2 else [],
+                color=config.EMBED_COLOUR,
+                timestamp=ipy.Timestamp.utcnow(),
+                footer=ipy.EmbedFooter(
+                    text=f"Page {page} / {len(descriptions)}",
+                    icon_url=config.BOT_AVATAR_URL
+                )
+            )
+        )
+    return embeds
