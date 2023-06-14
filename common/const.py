@@ -59,7 +59,7 @@ bot = ipy.Client(
 class Caches:  # Stores all caches, uses async-truckersmp implementation
     traffic_servers = Cache(name="traffic_servers", max_size=1, time_to_live=90)  # Traffic servers stored in one obj
     traffic = Cache(name="traffic", max_size=20, time_to_live=90)  # Each traffic server is stored as a seperate obj
-    time = Cache(name="time", max_size=1, time_to_live=5)
+    time = Cache(name="time", max_size=1, time_to_live=10)
     steam_vanityurl = Cache(name="steam_vanityurl", max_size=3000, time_to_live=timedelta(days=5))
     sim_score = Cache(name="sim_score", max_size=200_000)
     server_choice = Cache(name="server_choice", max_size=2000)

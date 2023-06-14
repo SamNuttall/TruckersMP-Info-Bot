@@ -15,15 +15,15 @@ from common.data import retrieve as data
 
 class Servers:
     @staticmethod
-    async def _get_base_data():
+    async def _get_base_data(bot):
         servers = await execute(truckersmp.get_servers)
-        ingame_time = utils.format_time(data.get_ingame_time())
+        ingame_time = utils.format_time(data.get_ingame_time(bot.synced_ingame_time))
         return servers, ingame_time
 
     @staticmethod
-    async def overview(game: str = None):
+    async def overview(bot, game: str = None):
         try:
-            servers, ingame_time = await Servers._get_base_data()
+            servers, ingame_time = await Servers._get_base_data(bot)
         except exceptions.ExecuteError:
             return embeds.generic_error()
         return embeds.servers_stats(
@@ -33,9 +33,9 @@ class Servers:
         )
 
     @staticmethod
-    async def singular(server_id: int):
+    async def singular(bot, server_id: int):
         try:
-            servers, ingame_time = await Servers._get_base_data()
+            servers, ingame_time = await Servers._get_base_data(bot)
         except exceptions.ExecuteError:
             return embeds.generic_error()
         server = utils.get_server_via_id(servers, server_id)

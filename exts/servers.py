@@ -8,6 +8,7 @@ from truckersmp.base import execute
 
 import config
 from common.const import truckersmp
+from common.data import retrieve
 from common.discord import choices
 from common.discord import command as cmd
 from common.ui import retrieve as ui
@@ -26,7 +27,7 @@ class ServersExtension(ipy.Extension):
             game = None
         server_id = server
 
-        embeds_func = ui.Servers.singular(server_id) if server_id else ui.Servers.overview(game)
+        embeds_func = ui.Servers.singular(self.bot, server_id) if server_id else ui.Servers.overview(self.bot, game)
         await ctx.send(
             embeds=await embeds_func,
             ephemeral=config.EPHEMERAL_RESPONSES
@@ -41,3 +42,14 @@ class ServersExtension(ipy.Extension):
         await ctx.send(
             choices=await choices.get_servers(servers, ctx.input_text)
         )
+
+    @ipy.Task.create(ipy.TimeTrigger(hour=2, minute=0))  # run daily at 2am
+    async def sync_time(self):
+        """Time is synced from the API daily and then the actual in-game time is calculated based off the last sync"""
+        self.bot.synced_ingame_time = await retrieve.sync_time()
+
+    @ipy.listen()
+    async def on_startup(self):
+        self.bot.synced_ingame_time = None
+        await self.sync_time()  # sync time when bot starts
+        self.sync_time.start()
