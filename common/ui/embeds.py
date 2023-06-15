@@ -58,6 +58,16 @@ def cannot_use_component():
     )
 
 
+def missing_permission(description):
+    return ipy.Embed(
+        title=f":negative_squared_cross_mark: Missing Permissions!",
+        description=(
+                description+f"\nFor support, join Alfie's [Discord support server]({config.SUPPORT_SERVER_INVITE})."
+        ),
+        color=config.EMBED_ERROR_COLOUR
+    )
+
+
 def format_fields(fields: list, expected_length: int = 9):
     """Add extra fields to display extra info and align content"""
     input_len = len(fields)

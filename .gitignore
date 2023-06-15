@@ -4,3 +4,4 @@ venv/
 .idea
 *.log
 /config.py
+/db.sqlite

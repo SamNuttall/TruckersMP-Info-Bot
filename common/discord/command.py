@@ -16,6 +16,8 @@ class Name:
     INFO = "info"
     DEV_INFO = "devinfo"
     FEEDBACK = "feedback"
+    PINS = "pins"
+    PINS_ADD = "add"
 
 
 class Description:
@@ -27,6 +29,8 @@ class Description:
     INFO = "Get information about the bot"
     DEV_INFO = "Get information about the bot backend (admin)"
     FEEDBACK = "Give feedback to the bot developer (opens a form, max submission of one a day)"
+    PINS = "Manage this server's pins - an automatically updating message."
+    PINS_ADD = "Add a pin to this server - an automatically updating message."
 
 
 class OptionName:
@@ -35,6 +39,8 @@ class OptionName:
     LOCATION = "location"
     ID = "id"
     NAME = "name"
+    PIN_TYPE = "type"
+    PIN_CHANNEL = "channel"
 
 
 class OptionDescription:
@@ -46,6 +52,8 @@ class OptionDescription:
     PLAYER_ID = "Search for a player using their TruckersMP or Steam ID"
     PLAYER_NAME = "Search for a player via their name (Experimental: Uses Steam due to TruckersMP limitations)"
     EVENT_ID = "Search for an event using its TruckersMP ID"
+    PIN_TYPE = "Select a pin type, which determines what is sent and kept updated"
+    PIN_CHANNEL = "Select a text channel for where the pin will be sent (default: this channel)"
 
 
 class Options:
@@ -107,6 +115,22 @@ class Options:
             type=ipy.OptionType.INTEGER,
             name=OptionName.ID,
             description=OptionDescription.EVENT_ID,
+            required=False
+        )
+    ]
+    PINS_ADD = [
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.INTEGER,
+            name=OptionName.PIN_TYPE,
+            description=OptionDescription.PIN_TYPE,
+            required=True,
+            choices=choices.get_pin_types()
+        ),
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.CHANNEL,
+            name=OptionName.PIN_CHANNEL,
+            channel_types=[ipy.ChannelType.GUILD_TEXT],
+            description=OptionDescription.PIN_CHANNEL,
             required=False
         )
     ]

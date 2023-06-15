@@ -178,3 +178,20 @@ def get_games():
             value=short_name
         ))
     return choice_list
+
+
+def get_pin_types():
+    choice_list = []
+    types = {
+        1: "Servers (Overview)",
+        2: "Traffic (Busiest Areas)",
+        3: "Events (Featured)",
+        4: "Events (Upcoming)",
+        5: "Events (Now)"
+    }
+    for type_id, name in types.items():
+        choice_list.append(ipy.SlashCommandChoice(
+            name=name,
+            value=type_id
+        ))
+    return choice_list
