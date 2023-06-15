@@ -49,14 +49,11 @@ class Pin:
         return self
 
     @classmethod
-    def create(cls, pin_type: int, guild_id: int, channel_id: int, message_id: int):
+    async def fetch(cls, conn, guild_id: int, channel_id: int, message_id: int):
         """
-        Create from raw variables
+        Create from raw variables, fetching the object from the database
         """
-        self = Pin()
-        self.guild = Guild.create(guild_id)
-        self.type, self.channel_id, self.message_id = pin_type, channel_id, message_id
-        return self
+        return Pin.create_from_row(await get_pin(conn, guild_id, channel_id, message_id))
 
     @classmethod
     async def create_and_finish(cls, bot: ipy.Client, pin_type, guild_id: int, channel_id: int):
@@ -104,6 +101,8 @@ class Pin:
         message = await channel.fetch_message(self.message_id)
         if not permissions.check_channel_permissions(bot.user, channel, permissions.SEND_AND_EDIT)[0]:
             return False
+        if message is None:
+            return False
         await message.edit(embed=sendable)
         return True
 
@@ -133,6 +132,12 @@ async def get_pins(
         async for row in cursor:
             pins.append(Pin.create_from_row(row))
     return pins
+
+
+async def get_pin(conn: aiosqlite.Connection, guild_id: int, channel_id: int, message_id: int) -> Pin:
+    for pin in await get_pins(conn, guild_id=guild_id):
+        if pin.message_id == message_id and pin.channel_id == channel_id:
+            return pin
 
 
 async def add_pin(conn: aiosqlite.Connection, pin: Pin):
