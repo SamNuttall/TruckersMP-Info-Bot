@@ -8,6 +8,7 @@ import interactions as ipy
 from aiolimiter import AsyncLimiter
 
 import config
+from common.const import logger
 from common.data.db import Guild
 from common.data.db.models import Pin
 from common.discord import command as cmd, permissions, choices
@@ -92,10 +93,18 @@ class PinsExtension(ipy.Extension):
 
         tasks = [update_pin(pin, sem) for pin in pins]
         start_time = time.monotonic()
-        results = await asyncio.gather(*tasks)
+        statuses, errors = zip(*await asyncio.gather(*tasks))
         end_time = time.monotonic()
-        print(f"Update Pins! {sum(results)}/{len(results)} successful | {round(end_time - start_time)}")
-        # TODO: Properly log
+        updated_pins = zip(pins, errors)
+        errored_log = ""
+        for p in updated_pins:
+            if p[1] is not None:
+                errored_log += f"\nguild_id: {p[0].guild.id}, channel_id: {p[0].channel_id}, " \
+                               f"message_id: {p[0].message_id} -> msg: {p[1]}"
+        log_msg = f"Pins updated: {sum(statuses)}/{len(statuses)} successful, took {round(end_time - start_time, 2)}s"
+        logger.info(
+            log_msg + errored_log
+        )
 
     @ipy.listen()
     async def on_startup(self):

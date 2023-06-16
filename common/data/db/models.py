@@ -113,5 +113,5 @@ class Pin(Model):
         await message.edit(embed=sendable)
         return True, None
 
-    async def run_update(self) -> bool:
-        return (await self._run_update())[0]
+    async def run_update(self) -> tuple[bool, Optional[str]]:
+        return await self._run_update()
