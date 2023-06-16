@@ -8,9 +8,9 @@ import interactions as ipy
 from aiolimiter import AsyncLimiter
 
 import config
-from common.data import db
-from common.data.db import Pin
-from common.discord import command as cmd, permissions
+from common.data.db import Guild
+from common.data.db.models import Pin
+from common.discord import command as cmd, permissions, choices
 from common.ui import embeds
 
 
@@ -58,19 +58,37 @@ class PinsExtension(ipy.Extension):
             channel = ctx.channel
         if not await check_sendable(self.bot, ctx, channel):
             return  # function sends message
-        await Pin.create_and_finish(self.bot, type, ctx.guild_id, channel.id)
+        await Pin.create_new_msg(pin_type=type, guild_id=ctx.guild_id, channel_id=channel.id)
         await ctx.send(f":white_check_mark: **Pin created!** Check it out in {channel.mention}.", ephemeral=True)
+
+    @pins_cmd.subcommand(
+        sub_cmd_name=cmd.Name.PINS_REMOVE,
+        sub_cmd_description=cmd.Description.PINS_REMOVE,
+        options=cmd.Options.PINS_REMOVE,
+    )
+    async def pins_remove_cmd(self, ctx: ipy.InteractionContext, pin: int):
+        await Pin.filter(id=pin).delete()
+        await ctx.send(
+            ":negative_squared_cross_mark: **Pin removed!** The message will no longer be updated.",
+            ephemeral=True
+        )
+
+    @pins_remove_cmd.autocomplete(cmd.OptionName.PIN)
+    async def autocomplete_traffic_server(self, ctx: ipy.AutocompleteContext):
+        await ctx.send(
+            choices=await choices.get_guild_pins(self.bot, ctx.guild_id, ctx.input_text)
+        )
 
     @ipy.Task.create(ipy.IntervalTrigger(minutes=5))
     async def update_pins_task(self):
-        pins = await db.get_pins(self.bot.db, exclude_invisible_guilds=True)
+        pins = await Pin.all().prefetch_related("guild")
         sem = asyncio.Semaphore(2)  # Number of simultaneous pins to edit - adjust later based on peaks
         limiter = AsyncLimiter(4, 2)  # 4 edits per 2 seconds (allows 600 per 5 min) - adjust later based on peaks
 
         async def update_pin(p, s):
             async with limiter:
                 async with s:
-                    return await p.update(self.bot)
+                    return await p.run_update()
 
         tasks = [update_pin(pin, sem) for pin in pins]
         start_time = time.monotonic()
@@ -81,11 +99,15 @@ class PinsExtension(ipy.Extension):
 
     @ipy.listen()
     async def on_startup(self):
+        await self.update_pins_task()
         self.update_pins_task.start()
 
     @ipy.listen()
     async def on_message_delete(self, event: ipy.api.events.MessageDelete):
         if event.message.author.id != self.bot.user.id:
             return
-        pin = await Pin.fetch(self.bot.db, event.message.guild.id, event.message.channel.id, event.message.id)
-        await pin.delete_from_db(self.bot.db)
+        await Pin.filter(
+            guild=Guild.get(id=event.message.guild.id),
+            channel_id=event.message.channel.id,
+            message_id=event.message.id
+        ).delete()

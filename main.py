@@ -3,19 +3,22 @@ Run this file to start the bot.
 """
 import asyncio
 
-import aiosqlite
+from tortoise import Tortoise
 
-from common import startup_utils, utils
+from common import startup_utils
 from common.const import bot
 
 
 async def run():
-    bot.db = await aiosqlite.connect("db.sqlite")
+    await Tortoise.init(
+        db_url='sqlite://db.sqlite',
+        modules={'models': ['common.data.db.models']}
+    )
+    await Tortoise.generate_schemas()
     try:
-        await utils.execute_sql_script_from_file(bot.db, "setup.sql")
         await bot.astart()
     finally:
-        await bot.db.close()
+        await Tortoise.close_connections()
 
 
 def main():

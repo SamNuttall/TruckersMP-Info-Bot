@@ -2,7 +2,6 @@
 Handles choices which are part of an option in a command.
 Functions here often return a list of choices to be presented to the user.
 """
-
 # TODO: Look into reducing memory footprint of sim_score cache and it's viability.
 # Once values are cached, the time to add sim scores is reduced (~60% decrease).
 # Memory footprint of current implementation is very large though. Approx at sizes:
@@ -10,11 +9,14 @@ Functions here often return a list of choices to be presented to the user.
 
 from difflib import SequenceMatcher
 
+import asyncio
 import interactions as ipy
 from thefuzz import fuzz
 
 from common.const import Caches
 from common import utils
+from common.data.db import models
+from common.data.db.models import Pin
 
 
 def add_sim_score_new(dict_list: list, search: str, key: str):
@@ -182,16 +184,30 @@ def get_games():
 
 def get_pin_types():
     choice_list = []
-    types = {
-        1: "Servers (Overview)",
-        2: "Traffic (Busiest Areas)",
-        3: "Events (Featured)",
-        4: "Events (Upcoming)",
-        5: "Events (Now)"
-    }
-    for type_id, name in types.items():
+    for type_id, name in models.PIN_TYPE_NAMES.items():
         choice_list.append(ipy.SlashCommandChoice(
             name=name,
             value=type_id
         ))
     return choice_list
+
+
+async def get_guild_pins(bot: ipy.Client, guild_id: int, filter_text: str = ""):
+    pins = await Pin.filter(guild_id=guild_id).all()
+
+    async def get_command_choice(p: Pin):
+        channel_name = "unknown"
+        channel = await bot.fetch_channel(p.channel_id)
+        if channel is not None:
+            channel_name = channel.name
+        display_name = f"{p.type_name} in #{channel_name}"
+        if filter_text.lower() not in display_name.lower():
+            return None
+        return ipy.SlashCommandChoice(
+            name=display_name,
+            value=p.id
+        )
+
+    tasks = [get_command_choice(pin) for pin in pins]
+    choice_list = await asyncio.gather(*tasks)
+    return filter(None, choice_list)

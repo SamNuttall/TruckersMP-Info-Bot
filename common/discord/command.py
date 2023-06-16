@@ -18,6 +18,7 @@ class Name:
     FEEDBACK = "feedback"
     PINS = "pins"
     PINS_ADD = "add"
+    PINS_REMOVE = "remove"
 
 
 class Description:
@@ -31,6 +32,7 @@ class Description:
     FEEDBACK = "Give feedback to the bot developer (opens a form, max submission of one a day)"
     PINS = "Manage this server's pins - an automatically updating message."
     PINS_ADD = "Add a pin to this server - an automatically updating message."
+    PINS_REMOVE = "Remove a pin from this server - normally, happens automatically if the bot's pin message is deleted."
 
 
 class OptionName:
@@ -41,6 +43,7 @@ class OptionName:
     NAME = "name"
     PIN_TYPE = "type"
     PIN_CHANNEL = "channel"
+    PIN = "pin"
 
 
 class OptionDescription:
@@ -54,6 +57,7 @@ class OptionDescription:
     EVENT_ID = "Search for an event using its TruckersMP ID"
     PIN_TYPE = "Select a pin type, which determines what is sent and kept updated"
     PIN_CHANNEL = "Select a text channel for where the pin will be sent (default: this channel)"
+    GUILD_PINS = "Select a pin within the server"
 
 
 class Options:
@@ -132,5 +136,14 @@ class Options:
             channel_types=[ipy.ChannelType.GUILD_TEXT],
             description=OptionDescription.PIN_CHANNEL,
             required=False
+        )
+    ]
+    PINS_REMOVE = [
+        ipy.SlashCommandOption(
+            type=ipy.OptionType.INTEGER,
+            name=OptionName.PIN,
+            description=OptionDescription.GUILD_PINS,
+            required=True,
+            autocomplete=True
         )
     ]
