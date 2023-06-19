@@ -43,7 +43,6 @@ class PinsExtension(ipy.Extension):
     @ipy.slash_command(
         name=cmd.Name.PINS,
         description=cmd.Description.PINS,
-        scopes=[config.ADMIN_GUILD_ID],
         dm_permission=False
     )
     @ipy.slash_default_member_permission(ipy.Permissions.MANAGE_GUILD)
