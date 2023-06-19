@@ -148,7 +148,7 @@ def servers_stats(servers: list, filter_by_game: str = None, ingame_time: str = 
         timestamp=ipy.Timestamp.utcnow(),
         fields=fields,
         footer=ipy.EmbedFooter(
-            text="Information provided by TruckersMP",
+            text="Info provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
     )
@@ -190,7 +190,7 @@ def server_stats(server: dict, ingame_time: str = None):
         color=config.EMBED_COLOUR,
         timestamp=ipy.Timestamp.utcnow(),
         footer=ipy.EmbedFooter(
-            text="Information provided by TruckersMP",
+            text="Info provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
     )
@@ -237,7 +237,7 @@ def traffic_stats(locations: list, filter_by_server_data: list[str], filter_by_g
         timestamp=ipy.Timestamp.utcnow(),
         fields=fields,
         footer=ipy.EmbedFooter(
-            text="Information provided by TruckyApp",
+            text="Info provided by TruckyApp",
             icon_url=config.BOT_AVATAR_URL
         )
     )
@@ -281,17 +281,17 @@ def player_stats(player: Player):
         color=config.EMBED_COLOUR,
         timestamp=ipy.Timestamp.utcnow(),
         footer=ipy.EmbedFooter(
-            text="Information provided by TruckersMP",
+            text="Info provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
     )
 
 
-def events_stats(events: list, list_name: str = "Events", max_size: int = 3):
+def events_stats(events: list, list_name: str = "Events", max_size: int = 3, include_links: bool = False):
     desc = None
     fields = []
     for index, event in enumerate(events, 1):
-        fields.append(embed_fields.get_event(event))
+        fields.append(embed_fields.get_event(event, include_link=include_links))
         if index == max_size:
             break
     if len(fields) <= 0:
@@ -306,7 +306,7 @@ def events_stats(events: list, list_name: str = "Events", max_size: int = 3):
         timestamp=ipy.Timestamp.utcnow(),
         fields=fields,
         footer=ipy.EmbedFooter(
-            text="Information provided by TruckersMP",
+            text="Info provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
     )
@@ -347,7 +347,7 @@ def event_stats(event: Event, avatar: str):
         color=config.EMBED_COLOUR,
         timestamp=ipy.Timestamp.utcnow(),
         footer=ipy.EmbedFooter(
-            text="Information provided by TruckersMP",
+            text="Info provided by TruckersMP",
             icon_url=config.BOT_AVATAR_URL
         )
     )

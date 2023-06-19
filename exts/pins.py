@@ -3,6 +3,7 @@ Extension for pins (auto updating messages)
 """
 import asyncio
 import time
+from datetime import timedelta
 
 import interactions as ipy
 from aiolimiter import AsyncLimiter
@@ -80,9 +81,11 @@ class PinsExtension(ipy.Extension):
             choices=await choices.get_guild_pins(self.bot, ctx.guild_id, ctx.input_text)
         )
 
-    @ipy.Task.create(ipy.IntervalTrigger(minutes=5))
-    async def update_pins_task(self):
+    @staticmethod
+    async def _update_pins():
         pins = await Pin.all().prefetch_related("guild")
+        if len(pins) == 0:
+            return
         sem = asyncio.Semaphore(2)  # Number of simultaneous pins to edit - adjust later based on peaks
         limiter = AsyncLimiter(4, 2)  # 4 edits per 2 seconds (allows 600 per 5 min) - adjust later based on peaks
 
@@ -106,6 +109,22 @@ class PinsExtension(ipy.Extension):
             log_msg + errored_log
         )
 
+    @staticmethod
+    async def _update_guilds():
+        guilds = await Guild.all()
+
+        async def update_guild(g: Guild):
+            if g.since_seen > timedelta(days=1):
+                await g.delete()
+
+        tasks = [update_guild(guild) for guild in guilds]
+        await asyncio.gather(*tasks)
+
+    @ipy.Task.create(ipy.IntervalTrigger(minutes=5))
+    async def update_pins_task(self):
+        await self._update_pins()
+        await self._update_guilds()
+
     @ipy.listen()
     async def on_startup(self):
         await self.update_pins_task()
@@ -115,8 +134,9 @@ class PinsExtension(ipy.Extension):
     async def on_message_delete(self, event: ipy.api.events.MessageDelete):
         if event.message.author.id != self.bot.user.id:
             return
-        await Pin.filter(
-            guild=Guild.get(id=event.message.guild.id),
+        pin = await Pin.get(
+            guild=Guild(id=event.message.guild.id),
             channel_id=event.message.channel.id,
             message_id=event.message.id
-        ).delete()
+        )
+        await pin.delete()

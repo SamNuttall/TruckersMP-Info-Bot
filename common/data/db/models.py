@@ -1,4 +1,5 @@
 import asyncio
+from datetime import timedelta
 from enum import IntEnum, Enum
 from typing import Optional
 
@@ -22,9 +23,17 @@ class Guild(Model):
     async def guild(self):
         return await bot.fetch_guild(self.id)
 
+    @property
+    def since_seen(self):
+        if self.last_seen is None:
+            return timedelta(seconds=0)
+        return tortoise.timezone.now() - self.last_seen
+
     async def mark_not_seen(self):
         if self.last_seen is None:
-            await self.update_from_dict({'last_seen': tortoise.timezone.now()})
+            self.last_seen = tortoise.timezone.now()
+            await self.update_from_dict({'last_seen': self.last_seen})
+            await self.save()
 
 
 class PinType(IntEnum):
@@ -50,6 +59,7 @@ class Pin(Model):
     guild = fields.ForeignKeyField('models.Guild', related_name='guilds')
     channel_id = fields.IntField()
     message_id = fields.IntField()
+    last_failure = fields.DatetimeField(null=True)
 
     def __str__(self):
         return str(self.id)
@@ -57,13 +67,18 @@ class Pin(Model):
     @classmethod
     async def _get_sendable(cls, pin_type: int):
         """Get a sendable message"""
+        num_of_events = 4
         match pin_type:
             case 1:
                 return await ui.Servers.overview(bot)
             case 2:
                 return await ui.Traffic.overview()
             case 3:
-                return ipy.Embed(title="Events Soon")
+                return await ui.Events.overview("featured", num_of_events, True)
+            case 4:
+                return await ui.Events.overview("upcoming", num_of_events, True)
+            case 5:
+                return await ui.Events.overview("now", num_of_events, True)
 
     @classmethod
     async def _send_new(cls, pin_type: int, channel_id: int):
@@ -91,9 +106,38 @@ class Pin(Model):
         guild = guild[0]
         return await Pin.create(type=pin_type, guild=guild, channel_id=channel_id, message_id=message.id)
 
+    @classmethod
+    def get_expiry(cls, pin_type: int):
+        ref = {
+            1: timedelta(minutes=60),
+            2: timedelta(minutes=60),
+            3: timedelta(hours=3),
+            4: timedelta(hours=3),
+            5: timedelta(hours=3),
+        }
+        return ref.get(pin_type, timedelta(hours=24))
+
     @property
     def type_name(self):
         return PIN_TYPE_NAMES.get(self.type, "Unknown Type")
+
+    @property
+    def last_failed(self):
+        if self.last_failure is None:
+            return timedelta(seconds=0)
+        return tortoise.timezone.now() - self.last_failure
+
+    async def mark_success(self):
+        if self.last_failure is not None:
+            self.last_failure = None
+            await self.update_from_dict({'last_failure': None})
+            await self.save()
+
+    async def mark_failed(self):
+        if self.last_failure is None:
+            self.last_failure = tortoise.timezone.now()
+            await self.update_from_dict({'last_failure': self.last_failure})
+            await self.save()
 
     async def _run_update(self) -> tuple[bool, Optional[str]]:
         if await self.guild.guild is None:
@@ -114,4 +158,11 @@ class Pin(Model):
         return True, None
 
     async def run_update(self) -> tuple[bool, Optional[str]]:
-        return await self._run_update()
+        results = await self._run_update()
+        if results[0]:
+            await self.mark_success()
+        else:
+            await self.mark_failed()
+        if self.last_failed > self.get_expiry(self.type):
+            await self.delete()
+        return results
