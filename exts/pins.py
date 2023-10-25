@@ -6,6 +6,7 @@ import time
 from datetime import timedelta
 
 import interactions as ipy
+import tortoise.exceptions
 from aiolimiter import AsyncLimiter
 
 import config
@@ -133,9 +134,13 @@ class PinsExtension(ipy.Extension):
     async def on_message_delete(self, event: ipy.api.events.MessageDelete):
         if event.message.author.id != self.bot.user.id:
             return
-        pin = await Pin.get(
-            guild=Guild(id=event.message.guild.id),
-            channel_id=event.message.channel.id,
-            message_id=event.message.id
-        )
-        await pin.delete()
+        try:
+            pin = await Pin.get(
+                guild=Guild(id=event.message.guild.id),
+                channel_id=event.message.channel.id,
+                message_id=event.message.id
+            )
+        except tortoise.exceptions.DoesNotExist:
+            pass  # a message was deleted but it is not a pin, so do nothing
+        else:
+            await pin.delete()
