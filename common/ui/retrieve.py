@@ -114,7 +114,7 @@ class Player:
 
 class Events:
     @staticmethod
-    async def overview(list_type: str = "featured"):
+    async def overview(list_type: str = "featured", num_of_events: int = 3, include_links: bool = False):
         try:
             events = await execute(truckersmp.get_events)
         except exceptions.ExecuteError:
@@ -129,7 +129,9 @@ class Events:
         events = utils.get_list_from_events(events, list_type)
         return embeds.events_stats(
             events=events,
-            list_name=list_name
+            list_name=list_name,
+            max_size=num_of_events,
+            include_links=include_links
         )
 
     @staticmethod

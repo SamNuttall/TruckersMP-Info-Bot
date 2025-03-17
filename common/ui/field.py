@@ -29,14 +29,17 @@ def get_location(location: dict):
     )
 
 
-def get_event(event):
+def get_event(event, include_link: bool = False):
     e = event
     start_time = utils.datetime_to_discord_str(utils.iso_to_datetime(event.start_at))
+    field_value = (
+        f"> :round_pushpin: {e.departure.location}, {e.departure.city}\n"
+        f"> :alarm_clock: {start_time}\n"
+        f"> :desktop: {e.server.name} ({e.game})\n"
+    )
+    if include_link:
+        field_value += f"*[View Online](https://truckersmp.com/events/{e.id})*"
     return ipy.EmbedField(
         name=event.name,
-        value=(
-            f":round_pushpin: {e.departure.location}, {e.departure.city}\n"
-            f":alarm_clock: {start_time}\n"
-            f":desktop: {e.server.name} ({e.game})\n"
-        )
+        value=field_value
     )

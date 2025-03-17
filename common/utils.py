@@ -104,3 +104,13 @@ def get_list_from_events(events, list_type: str = "Featured"):
 def is_component_author(ctx: ipy.ComponentContext):
     """Check if a user using a component is the author of the component's original command"""
     return ctx.author_id == ctx.message.interaction._user_id
+
+
+async def execute_sql_script_from_file(conn, filename):
+    """Execute an SQL script from a file using the provided db connection"""
+    with open(filename, 'r') as script_file:
+        file_content = script_file.read()
+    commands = file_content.split(";")
+    for command in commands:
+        await conn.execute(command)
+    await conn.commit()
