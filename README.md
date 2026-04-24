@@ -1,5 +1,8 @@
 <h1>Alfie - TruckersMP Info Discord Bot</h1>
 
+**⚠️ This Discord bot is no longer maintained and the repository has been archived.**
+<p>There will be no further features or bug fixes. The code remains available for reference or forking.</p>
+
 <h2>Overview</h2>
 <p>Alfie is a small yet modern companion for getting <a href="https://truckersmp.com/">TruckersMP</a> information straight to your Discord server.<br>This bot is free to add to your server or if you'd prefer, you can host your own instance.<br><b>Invite to your server:</b> <i><a href="https://discord.com/api/oauth2/authorize?client_id=937859809926074389&permissions=2147485696&scope=bot">Click here!</a></i></p>
 
